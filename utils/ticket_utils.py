@@ -1,0 +1,83 @@
+"""Generate Spectra HoliParty PDF tickets with name, ticket ID, and amount highlighted."""
+import io
+from fpdf import FPDF
+from PIL import Image
+
+
+def generate_ticket_pdf(booking):
+    """Generate a PDF ticket for the booking. Returns BytesIO buffer."""
+    qr_img = None
+    try:
+        from utils.qr_utils import generate_qr
+        qr_buf = generate_qr(booking['ticket_id'])
+        qr_img = Image.open(qr_buf)
+    except Exception:
+        pass
+
+    pass_type_labels = {
+        'entry': 'Entry Only',
+        'entry_starter': 'Entry + Starter',
+        'entry_starter_lunch': 'Entry + Starter + Lunch'
+    }
+    pass_label = pass_type_labels.get(booking.get('pass_type', 'entry'), 'Entry Only')
+    amount = booking.get('amount', booking['passes'] * 200)
+    venue = booking.get('venue', 'Mankundu Amrakunja Park')
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Header - Spectra HoliParty
+    pdf.set_font("Arial", 'B', 18)
+    pdf.set_text_color(255, 47, 146)
+    pdf.cell(0, 12, txt="SPECTRA HOLIPARTY 2026", ln=1, align='C')
+    pdf.set_font("Arial", '', 12)
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(0, 8, txt="Entry Ticket", ln=1, align='C')
+    pdf.ln(5)
+
+    # Ticket border effect (thick line)
+    pdf.set_draw_color(255, 47, 146)
+    pdf.set_line_width(1)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y())
+    pdf.ln(8)
+
+    # Name - prominent
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 8, txt=f"Name: {booking['name']}", ln=1)
+    pdf.set_font("Arial", '', 11)
+
+    # Ticket ID - prominent
+    pdf.set_font("Arial", 'B', 13)
+    pdf.set_text_color(0, 100, 0)
+    pdf.cell(0, 8, txt=f"Ticket ID: {booking['ticket_id']}", ln=1)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Arial", '', 11)
+
+    # Amount - HIGHLIGHTED
+    pdf.set_fill_color(255, 212, 0)  # Yellow highlight
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, txt=f"Amount Paid: Rs. {amount}", ln=1, fill=True)
+    pdf.set_font("Arial", '', 11)
+
+    # Other details
+    pdf.cell(0, 6, txt=f"Passes: {booking['passes']} | Type: {pass_label}", ln=1)
+    pdf.cell(0, 6, txt=f"Date: March 4, 2026 | Time: 10:00 AM - 5:00 PM", ln=1)
+    pdf.cell(0, 6, txt=f"Venue: {venue}", ln=1)
+    pdf.cell(0, 6, txt="Complimentary: Abir & Special Lassi", ln=1)
+    pdf.ln(5)
+
+    # QR Code
+    if qr_img:
+        y_pos = pdf.get_y()
+        pdf.image(qr_img, x=75, y=y_pos, w=60)
+        pdf.set_y(y_pos + 65)
+
+    pdf.set_font("Arial", 'I', 8)
+    pdf.set_text_color(128, 128, 128)
+    pdf.cell(0, 5, txt="Show this ticket at the gate. Organized by Spectra Group - 2nd Year of HoliParty!", ln=1, align='C')
+
+    pdf_buf = io.BytesIO()
+    pdf.output(pdf_buf)
+    pdf_buf.seek(0)
+    return pdf_buf

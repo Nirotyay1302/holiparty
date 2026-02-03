@@ -1,0 +1,707 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="about-hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-white mb-4">About Spectra HoliParty 2026</h1>
+                <p class="lead text-white-50 mb-4">Our 2nd year of organizing! Experience the ultimate celebration of colors, joy, and togetherness in our grand Holi extravaganza.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <div class="stat-card">
+                        <div class="stat-number">5000+</div>
+                        <div class="stat-label">Expected Guests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">10-5</div>
+                        <div class="stat-label">Event Hours</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">15+</div>
+                        <div class="stat-label">Activities</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image-container">
+                    <img src="https://images.unsplash.com/photo-1583163093287-1a0d5459bdce?w=600&h=400&fit=crop" alt="Holi Celebration" class="hero-image">
+                    <div class="floating-elements">
+                        <div class="floating-icon">🎨</div>
+                        <div class="floating-icon">🎵</div>
+                        <div class="floating-icon">🎪</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+
+<!-- Event Highlights -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Why Choose Our Holi Party?</h2>
+            <p class="lead text-muted">Discover what makes our celebration truly special</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                    </div>
+                    <h5>Safe & Secure</h5>
+                    <p>Professional security personnel and first-aid stations throughout the venue.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-leaf fa-3x text-success"></i>
+                    </div>
+                    <h5>Eco-Friendly</h5>
+                    <p>Biodegradable colors and sustainable practices for a green celebration.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-music fa-3x text-warning"></i>
+                    </div>
+                    <h5>Live Entertainment</h5>
+                    <p>DJ performances, cultural dances, and traditional music throughout the event.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-utensils fa-3x text-danger"></i>
+                    </div>
+                    <h5>Delicious Food</h5>
+                    <p>Multiple food counters with variety of cuisines and complimentary snacks.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Event Schedule -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Event Schedule</h2>
+            <p class="lead text-muted">A day packed with colors, music, and unforgettable moments</p>
+        </div>
+        <div class="timeline-container">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-primary"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">10:00 AM</div>
+                        <h6>Doors Open</h6>
+                        <p>Welcome guests with traditional welcome drinks and entry passes</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-success"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">11:00 AM</div>
+                        <h6>Color Throwing Begins</h6>
+                        <p>Official start of Holi celebrations with safe, organic colors</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-warning"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">12:00 PM</div>
+                        <h6>DJ Performance</h6>
+                        <p>High-energy DJ sets with Bollywood and international hits</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-danger"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">2:00 PM</div>
+                        <h6>Cultural Dance</h6>
+                        <p>Traditional and contemporary dance performances</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-info"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">3:30 PM</div>
+                        <h6>Photo Booth & Games</h6>
+                        <p>Fun activities, photo booths, and interactive games</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-secondary"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">5:00 PM</div>
+                        <h6>Event Concludes</h6>
+                        <p>Grand finale and farewell celebrations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What to Expect -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">What to Expect</h2>
+            <p class="lead text-muted">Everything you need to know for an amazing Holi experience</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="expectations-grid">
+                    <div class="expectation-item">
+                        <div class="expectation-icon">🎨</div>
+                        <div class="expectation-content">
+                            <h6>Organic Colors</h6>
+                            <p>Safe, skin-friendly, and eco-friendly colors provided</p>
+                        </div>
+                    </div>
+                    <div class="expectation-item">
+                        <div class="expectation-icon">🥤</div>
+                        <div class="expectation-content">
+                            <h6>Complimentary Drinks</h6>
+                            <p>Traditional lassi, water, and welcome drinks available</p>
+                        </div>
+                    </div>
+                    <div class="expectation-item">
+                        <div class="expectation-icon">📸</div>
+                        <div class="expectation-content">
+                            <h6>Photo Booth</h6>
+                            <p>Professional photography and fun props available</p>
+                        </div>
+                    </div>
+                    <div class="expectation-item">
+                        <div class="expectation-icon">🛡️</div>
+                        <div class="expectation-content">
+                            <h6>Safety First</h6>
+                        <p>Medical team and security personnel on duty</p>
+                        </div>
+                    </div>
+                    <div class="expectation-item">
+                        <div class="expectation-icon">🍽️</div>
+                        <div class="expectation-content">
+                            <h6>Food Court</h6>
+                            <p>Variety of food options from street food to fine dining</p>
+                        </div>
+                    </div>
+                    <div class="expectation-item">
+                        <div class="expectation-icon">🎪</div>
+                        <div class="expectation-content">
+                            <h6>Activities Zone</h6>
+                            <p>Games, contests, and interactive entertainment</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="info-card">
+                    <h5>Event Information</h5>
+                    <div class="info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>March 4, 2026</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>10:00 AM - 5:00 PM</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Mankundu Amrakunja Park</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-users"></i>
+                        <span>5000+ Expected Guests</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-rupee-sign"></i>
+                        <span>From ₹200 | Entry+Starter ₹349</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">What Our Guests Say</h2>
+            <p class="lead text-muted">Hear from those who celebrated with us</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Amazing experience! The organization was flawless and the colors were fantastic. Will definitely come back next year!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">P</div>
+                        <div class="author-info">
+                            <h6>Priya Sharma</h6>
+                            <small class="text-muted">2025 Attendee</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"The best Holi party I've ever attended. Great music, delicious food, and such a welcoming atmosphere!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">R</div>
+                        <div class="author-info">
+                            <h6>Rahul Verma</h6>
+                            <small class="text-muted">2025 Attendee</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Loved the eco-friendly approach and the variety of activities. The DJ was amazing and the food was incredible!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">A</div>
+                        <div class="author-info">
+                            <h6>Anjali Patel</h6>
+                            <small class="text-muted">2025 Attendee</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="lead text-muted">Everything you need to know before attending</p>
+        </div>
+        <div class="faq-container">
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            What is the entry fee for the event?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Entry starts at ₹200. Entry+Starter is ₹349, Entry+Starter+Lunch ₹499. Includes access to all activities, complimentary organic colors, and welcome drinks. Group booking (5+): 10% off!
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Are children allowed?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes! Children under 5 years enter free. For children above 5, full entry fee applies. We have special activities planned for kids.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Is outside food and drinks allowed?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            No, outside food and drinks are not permitted. We have multiple food counters with a variety of delicious options available.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            What should I wear?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Wear old white clothes that you don't mind getting colored. Bring a change of clothes if you wish to change later.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                            Is parking available?
+                        </button>
+                    </h2>
+                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes, ample parking is available at the venue. Valet parking service is also available for ₹50.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.about-hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 50px 50px;
+    overflow: hidden;
+}
+
+.about-hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://images.unsplash.com/photo-1583163093287-1a0d5459bdce?w=1920&h=1080&fit=crop') center/cover no-repeat;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 2;
+}
+
+.about-hero-section .container {
+    position: relative;
+    z-index: 3;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    margin-bottom: 1rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffd400;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: white;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hero-image-container {
+    position: relative;
+    text-align: center;
+}
+
+.hero-image {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.floating-elements {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    z-index: 4;
+}
+
+.floating-icon {
+    display: inline-block;
+    background: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-icon:nth-child(2) { animation-delay: 1s; }
+.floating-icon:nth-child(3) { animation-delay: 2s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.section-title {
+    background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 1rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border-color: #ff2f92;
+}
+
+.feature-icon {
+    color: #ff2f92;
+    margin-bottom: 1rem;
+}
+
+.timeline-container {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #ff2f92, #ffd400, #32cd32);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px #ff2f92;
+}
+
+.timeline-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid #ff2f92;
+}
+
+.timeline-time {
+    color: #ff2f92;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.expectations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.expectation-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.expectation-item:hover {
+    transform: translateX(10px);
+}
+
+.expectation-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+    min-width: 60px;
+    text-align: center;
+}
+
+.info-card {
+    background: linear-gradient(135deg, #ff2f92, #ffd400);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(255,47,146,0.3);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.info-item i {
+    margin-right: 0.75rem;
+    width: 20px;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.testimonial-content p {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.testimonial-content p::before {
+    content: '"';
+    font-size: 3rem;
+    color: #ff2f92;
+    position: absolute;
+    top: -10px;
+    left: -20px;
+    font-family: Georgia, serif;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff2f92, #ffd400);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.faq-container .accordion-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 10px !important;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.faq-container .accordion-button {
+    background: white;
+    color: #333;
+    font-weight: 600;
+    padding: 1.5rem;
+    border: none;
+    box-shadow: none;
+}
+
+.faq-container .accordion-button:not(.collapsed) {
+    background: linear-gradient(45deg, #ff2f92, #ffd400);
+    color: white;
+}
+
+.faq-container .accordion-body {
+    padding: 1.5rem;
+    background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .about-hero-section {
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+
+    .hero-image {
+        max-width: 300px;
+    }
+
+    .floating-elements {
+        display: none;
+    }
+
+    .expectations-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .expectation-item:hover {
+        transform: none;
+    }
+
+    .timeline {
+        padding-left: 20px;
+    }
+
+    .timeline-marker {
+        left: -17px;
+        width: 16px;
+        height: 16px;
+    }
+}
+</style>
+
+{% endblock %}

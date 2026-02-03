@@ -1,0 +1,729 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section class="contact-hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-white mb-4">Get In Touch</h1>
+                <p class="lead text-white-50 mb-4">We'd love to hear from you! Whether you have questions about the event, need assistance with bookings, or just want to share your excitement, our team is here to help.</p>
+                <div class="contact-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-text">Support Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">< 2hrs</div>
+                        <div class="stat-text">Response Time</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-text">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="contact-icon-large">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="floating-bubbles">
+                        <div class="bubble">📧</div>
+                        <div class="bubble">📱</div>
+                        <div class="bubble">💬</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.contact-hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding: 4rem 0;
+    border-radius: 0 0 50px 50px;
+    overflow: hidden;
+}
+
+.contact-hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&h=1080&fit=crop') center/cover no-repeat;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 2;
+}
+
+.contact-hero-section .container {
+    position: relative;
+    z-index: 3;
+}
+
+.contact-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    min-width: 120px;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffd400;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.stat-text {
+    color: white;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hero-visual {
+    position: relative;
+    text-align: center;
+}
+
+.contact-icon-large {
+    font-size: 8rem;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 2rem;
+}
+
+.floating-bubbles {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+}
+
+.bubble {
+    display: inline-block;
+    background: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: bubbleFloat 4s ease-in-out infinite;
+}
+
+.bubble:nth-child(2) { animation-delay: 1s; }
+.bubble:nth-child(3) { animation-delay: 2s; }
+
+@keyframes bubbleFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.section-title {
+    background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 1rem;
+}
+
+.quick-contact-card {
+    background: white;
+    padding: 2rem 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+    height: 100%;
+}
+
+.quick-contact-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border-color: #ff2f92;
+}
+
+.contact-icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.contact-info-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 2rem;
+}
+
+.contact-icon-wrapper {
+    background: linear-gradient(45deg, #ff2f92, #ffd400);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.social-link.facebook { background: #1877f2; color: white; }
+.social-link.instagram { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; }
+.social-link.twitter { background: #1da1f2; color: white; }
+.social-link.youtube { background: #ff0000; color: white; }
+.social-link.whatsapp { background: #25d366; color: white; }
+
+.social-link:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.contact-form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.form-header {
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.input-group-text {
+    background: linear-gradient(45deg, #ff2f92, #ffd400);
+    color: white;
+    border: none;
+}
+
+.map-container {
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.transport-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.transport-card:hover {
+    transform: translateY(-5px);
+}
+
+.transport-icon {
+    font-size: 2rem;
+    color: #ff2f92;
+    margin-bottom: 1rem;
+}
+
+.accordion-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 10px !important;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.accordion-button {
+    background: white;
+    color: #333;
+    font-weight: 600;
+    padding: 1.5rem;
+    border: none;
+    box-shadow: none;
+}
+
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(45deg, #ff2f92, #ffd400);
+    color: white;
+}
+
+.accordion-body {
+    padding: 1.5rem;
+    background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .contact-hero-section {
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .contact-stats {
+        justify-content: center;
+    }
+
+    .stat-item {
+        min-width: 100px;
+    }
+
+    .hero-visual {
+        display: none;
+    }
+
+    .quick-contact-card {
+        margin-bottom: 1rem;
+    }
+
+    .contact-info-card {
+        position: static;
+        margin-bottom: 2rem;
+    }
+
+    .floating-bubbles {
+        display: none;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    const contactMessage = document.getElementById('contactMessage');
+    if (!contactForm || !contactMessage) return;
+
+contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+    // Get form data
+    const formData = new FormData(this);
+
+    // Simulate form submission (replace with actual backend call)
+    setTimeout(() => {
+        // Show success message
+        const messageDiv = document.getElementById('formMessage');
+        messageDiv.style.display = 'block';
+        messageDiv.className = 'alert alert-success';
+        messageDiv.innerHTML = '<i class="fas fa-check-circle me-2"></i>Thank you for your message! We will get back to you within 2 hours.';
+
+        // Reset form
+        this.reset();
+
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+
+        // Hide message after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }, 2000);
+});
+
+// Character counter for message textarea
+contactMessage.addEventListener('input', function() {
+    const maxLength = 500;
+    const currentLength = this.value.length;
+
+    if (currentLength > maxLength) {
+        this.value = this.value.substring(0, maxLength);
+    }
+});
+});
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Quick Contact Options -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">How Can We Help You?</h2>
+            <p class="lead text-muted">Choose the best way to reach out to us</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="quick-contact-card text-center">
+                    <div class="contact-icon-circle bg-primary">
+                        <i class="fas fa-ticket-alt fa-2x"></i>
+                    </div>
+                    <h5>Booking Help</h5>
+                    <p>Questions about tickets, payments, or reservations</p>
+                    <a href="#contactForm" class="btn btn-primary btn-sm">Get Help</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="quick-contact-card text-center">
+                    <div class="contact-icon-circle bg-success">
+                        <i class="fas fa-info-circle fa-2x"></i>
+                    </div>
+                    <h5>Event Info</h5>
+                    <p>Details about schedule, activities, or venue</p>
+                    <a href="#contactForm" class="btn btn-success btn-sm">Learn More</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="quick-contact-card text-center">
+                    <div class="contact-icon-circle bg-warning">
+                        <i class="fas fa-handshake fa-2x"></i>
+                    </div>
+                    <h5>Partnership</h5>
+                    <p>Business inquiries or collaboration opportunities</p>
+                    <a href="#contactForm" class="btn btn-warning btn-sm">Partner With Us</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="quick-contact-card text-center">
+                    <div class="contact-icon-circle bg-danger">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                    <h5>Support</h5>
+                    <p>Technical issues or general assistance</p>
+                    <a href="#contactForm" class="btn btn-danger btn-sm">Get Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Contact Information -->
+            <div class="col-lg-5">
+                <div class="contact-info-card">
+                    <h2 class="mb-4">Contact Information</h2>
+
+                    <div class="contact-item d-flex align-items-start mb-4">
+                        <div class="contact-icon-wrapper me-3">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Email Us</h6>
+                            <p class="mb-0 text-muted">info@holi-party.com</p>
+                            <small class="text-muted">We respond within 2 hours</small>
+                        </div>
+                    </div>
+
+                    <div class="contact-item d-flex align-items-start mb-4">
+                        <div class="contact-icon-wrapper me-3">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">{{ content.contact_persons[0].name }}</h6>
+                            <p class="mb-0 text-muted">+91 {{ content.contact_persons[0].phone }}</p>
+                            <small class="text-muted">Available 9 AM - 9 PM</small>
+                        </div>
+                    </div>
+
+                    <div class="contact-item d-flex align-items-start mb-4">
+                        <div class="contact-icon-wrapper me-3">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">{{ content.contact_persons[1].name }}</h6>
+                            <p class="mb-0 text-muted">+91 {{ content.contact_persons[1].phone }}</p>
+                            <small class="text-muted">Available 9 AM - 9 PM</small>
+                        </div>
+                    </div>
+
+                    <div class="contact-item d-flex align-items-start mb-4">
+                        <div class="contact-icon-wrapper me-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Venue</h6>
+                            <p class="mb-0 text-muted">{{ content.venue }}</p>
+                            <small class="text-muted">Central location, easy access</small>
+                        </div>
+                    </div>
+
+                    <div class="contact-item d-flex align-items-start mb-4">
+                        <div class="contact-icon-wrapper me-3">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Organized By</h6>
+                            <p class="mb-0 text-muted">{{ content.organizer }}</p>
+                            <small class="text-muted">Since 2018</small>
+                        </div>
+                    </div>
+
+                    <!-- Social Media -->
+                    <div class="mt-5">
+                        <h6 class="mb-3">Follow Us</h6>
+                        <div class="social-links">
+                            <a href="#" class="social-link facebook" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link instagram" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link twitter" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link youtube" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="#" class="social-link whatsapp" title="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <div class="contact-form-card">
+                    <div class="form-header">
+                        <h3 class="mb-3">Send us a Message</h3>
+                        <p class="text-muted mb-0">Fill out the form below and we'll get back to you as soon as possible.</p>
+                    </div>
+
+                    <form id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contactName" class="form-label">Full Name *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="contactName" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="contactEmail" class="form-label">Email Address *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="contactEmail" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactPhone" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input type="tel" class="form-control" id="contactPhone" name="phone" placeholder="Optional">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactSubject" class="form-label">Subject *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                <select class="form-select" id="contactSubject" name="subject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="booking">Booking & Tickets</option>
+                                    <option value="event">Event Information</option>
+                                    <option value="partnership">Partnership & Sponsorship</option>
+                                    <option value="technical">Technical Support</option>
+                                    <option value="feedback">Feedback & Suggestions</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="contactMessage" class="form-label">Message *</label>
+                            <textarea class="form-control" id="contactMessage" name="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
+                            <div class="form-text">Maximum 500 characters</div>
+                        </div>
+
+                        <!-- Newsletter Signup -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="newsletterSignup">
+                                <label class="form-check-label" for="newsletterSignup">
+                                    Subscribe to our newsletter for event updates and special offers
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+
+                    <!-- Success/Error Messages -->
+                    <div id="formMessage" class="mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center mb-4">
+                    <h2 class="section-title">Find Our Location</h2>
+                    <p class="lead text-muted">Easy to reach, centrally located venue</p>
+                </div>
+                <div class="map-container rounded shadow overflow-hidden">
+                    <iframe
+                        src="https://maps.google.com/maps?q=Mankundu+Amrakunja+Park&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        width="100%"
+                        height="450"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Mankundu Amrakunja Park - Event Venue">
+                    </iframe>
+                    <div class="map-overlay-link">
+                        <a href="https://www.google.com/maps/search/Mankundu+Amrakunja+Park" target="_blank" rel="noopener" class="btn btn-sm btn-light shadow">
+                            <i class="fas fa-external-link-alt me-1"></i>Open in Google Maps
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transportation Info -->
+                <div class="row mt-4 g-4">
+                    <div class="col-md-4">
+                        <div class="transport-card text-center">
+                            <div class="transport-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <h6>By Car</h6>
+                            <p class="small">Ample parking available. Valet service ₹50</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="transport-card text-center">
+                            <div class="transport-icon">
+                                <i class="fas fa-bus"></i>
+                            </div>
+                            <h6>By Public Transport</h6>
+                            <p class="small">Bus stop 2 mins walk. Metro station 5 mins</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="transport-card text-center">
+                            <div class="transport-icon">
+                                <i class="fas fa-taxi"></i>
+                            </div>
+                            <h6>By Taxi/Rideshare</h6>
+                            <p class="small">Uber/Ola available. Drop-off at main gate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Quick Answers</h2>
+            <p class="lead text-muted">Common questions about contacting us</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="contactFaq">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                How quickly will I get a response?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#contactFaq">
+                            <div class="accordion-body">
+                                We typically respond within 2 hours during business hours (9 AM - 9 PM IST). For urgent matters, please call our contact numbers listed above.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Can I call you directly?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                            <div class="accordion-body">
+                                Yes! Our contact persons are available by phone during business hours. For best results, please use the contact form first or send an email.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Do you have WhatsApp support?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                            <div class="accordion-body">
+                                Yes, you can reach us on WhatsApp for quick queries and support. Click the WhatsApp icon in our social links to start a conversation.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

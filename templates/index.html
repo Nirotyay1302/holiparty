@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<section id="home" class="hero-section">
+    <div class="hero-content">
+        <div class="confetti">
+            <div class="confetti-piece" style="left: 10%; animation-delay: 0s;"></div>
+            <div class="confetti-piece" style="left: 20%; animation-delay: 1s;"></div>
+            <div class="confetti-piece" style="left: 30%; animation-delay: 2s;"></div>
+            <div class="confetti-piece" style="left: 40%; animation-delay: 0.5s;"></div>
+            <div class="confetti-piece" style="left: 50%; animation-delay: 1.5s;"></div>
+            <div class="confetti-piece" style="left: 60%; animation-delay: 2.5s;"></div>
+            <div class="confetti-piece" style="left: 70%; animation-delay: 0.8s;"></div>
+            <div class="confetti-piece" style="left: 80%; animation-delay: 1.8s;"></div>
+            <div class="confetti-piece" style="left: 90%; animation-delay: 2.2s;"></div>
+        </div>
+        <h1 class="display-4 fw-bold">Experience the Colors of Joy</h1>
+        <p class="lead mb-4">Join us for the ultimate Holi celebration with music, dance, and vibrant festivities that bring everyone together in joy and harmony.</p>
+        <div class="countdown-timer mb-4">
+            <div class="countdown-item">
+                <div class="number" id="days">00</div>
+                <div class="label">Days</div>
+            </div>
+            <div class="countdown-item">
+                <div class="number" id="hours">00</div>
+                <div class="label">Hours</div>
+            </div>
+            <div class="countdown-item">
+                <div class="number" id="minutes">00</div>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="countdown-item">
+                <div class="number" id="seconds">00</div>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <span class="badge bg-warning text-dark fs-5 px-3 py-2 rounded-pill">Event: {{ content.event_date }} at {{ content.event_time }} | Venue: {{ content.venue }}</span>
+        </div>
+        <div class="mb-4">
+            <span class="badge bg-warning text-dark fs-5 px-3 py-2 rounded-pill">Our 2nd Year of HoliParty! | Entry from ₹{{ content.pricing.entry_pass }}</span>
+        </div>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="#booking" class="btn btn-primary btn-lg">Book Your Tickets</a>
+            <a href="#about" class="btn btn-outline-light btn-lg">Learn More</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4 section-title">Spectra HoliParty – 2nd Year | Your ₹{{ content.pricing.entry_pass }} Pass Includes</h2>
+        <p class="text-center mb-5">Get the complete Holi experience with our all-inclusive entry pass. Additional food and drinks available at our counters.</p>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🎨 Complimentary Abir</h5>
+                        <p class="card-text">Get colorful organic abir included with your entry pass</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🥛 Unlimited Special Lassi</h5>
+                        <p class="card-text">Enjoy unlimited servings of our special homemade lassi throughout the event</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🎵 Live DJ & Music</h5>
+                        <p class="card-text">Dance to the beats of popular Holi songs and remixes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">📸 Photo Zone</h5>
+                        <p class="card-text">Capture colorful memories at our special photo booths</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🛡️ Safe & Secure</h5>
+                        <p class="card-text">Family-friendly event with security personnel on site</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🌧️ Rain Dance</h5>
+                        <p class="card-text">Enjoy the rain dance area with color-infused water</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p><strong>Food & Refreshments:</strong> Multiple food counters will be available with a variety of delicious options including chaat, fast food, beverages, and traditional Holi treats. Purchases are separate from the entry pass.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Previous Year Photos -->
+<section id="photos" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4 section-title">Previous Year Photos</h2>
+        <p class="text-center mb-5">Relive the colorful moments from our past celebrations. Be part of this year's unforgettable memories!</p>
+        <div class="row g-4">
+            <!-- Featured photo - image 1.jpeg -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 photo-card overflow-hidden">
+                    <img src="{{ url_for('static', filename='images/image 1.jpeg') }}" alt="Holi Party 2025" class="card-img-top" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">2025</h5>
+                    </div>
+                </div>
+            </div>
+            <!-- Placeholder slots for future photos - add more via Admin > Content Management > Gallery Images, or replace placeholders with img tags -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 photo-placeholder">
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 250px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                        <span class="text-muted"><i class="fas fa-image fa-3x mb-2 d-block"></i>Photo coming soon</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-0 text-muted">—</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 photo-placeholder">
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 250px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                        <span class="text-muted"><i class="fas fa-image fa-3x mb-2 d-block"></i>Photo coming soon</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-0 text-muted">—</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 photo-placeholder">
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 250px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                        <span class="text-muted"><i class="fas fa-image fa-3x mb-2 d-block"></i>Photo coming soon</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-0 text-muted">—</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="booking" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4" style="background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold; font-size: clamp(2.5rem, 5vw, 4rem);">Book Your Tickets</h2>
+
+        <!-- Group Booking Offer - Prominent Highlight -->
+        <div class="group-offer-banner mb-5">
+            <div class="group-offer-inner">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-2 text-center">
+                        <span class="group-offer-icon">👥</span>
+                        <h3 class="group-offer-percent mb-0">10%</h3>
+                        <small class="text-white-50">OFF</small>
+                    </div>
+                    <div class="col-lg-7">
+                        <h4 class="mb-2">🎉 Group Booking Special Offer</h4>
+                        <p class="mb-0 mb-lg-0">Book <strong>5 or more passes</strong> and get <strong>10% discount</strong> on your total bill! Perfect for friends, families, and colleagues. The more you book, the more you save. Apply coupon automatically at checkout when you select 5+ passes.</p>
+                    </div>
+                    <div class="col-lg-3 text-center text-lg-end">
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2">5+ Members = 10% Off</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Your Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="bookingForm" action="/create_order" method="POST">
+                            <input type="hidden" id="pass_type" name="pass_type" value="entry">
+                            <input type="hidden" id="amount" name="amount" value="200">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
+                                <div class="form-text">Enter 10-digit mobile number (e.g., 9876543210)</div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="address" class="form-label">Full Address *</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" placeholder="Enter your complete address (street, city, state, pincode)" required></textarea>
+                                <div class="form-text">This address will be used for ticket delivery and event communication</div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Pass Type *</label>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <div class="form-check border rounded p-3 pass-option" data-type="entry" data-price="{{ content.pricing.entry_pass }}">
+                                            <input class="form-check-input" type="radio" name="pass_type_radio" id="passEntry" value="entry" checked>
+                                            <label class="form-check-label w-100" for="passEntry">
+                                                <strong>Entry Only</strong> – ₹{{ content.pricing.entry_pass }}/person<br>
+                                                <small class="text-muted">Complimentary Abir, Lassi, Live DJ, Photo Booth, Rain Dance</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check border rounded p-3 pass-option" data-type="entry_starter" data-price="{{ content.pricing.entry_plus_starter }}">
+                                            <input class="form-check-input" type="radio" name="pass_type_radio" id="passStarter" value="entry_starter">
+                                            <label class="form-check-label w-100" for="passStarter">
+                                                <strong>Entry + Starter</strong> – ₹{{ content.pricing.entry_plus_starter }}/person<br>
+                                                <small class="text-muted">All entry benefits + Welcome snacks & beverages</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check border rounded p-3 pass-option" data-type="entry_starter_lunch" data-price="{{ content.pricing.get('entry_plus_starter_lunch', 499) }}">
+                                            <input class="form-check-input" type="radio" name="pass_type_radio" id="passLunch" value="entry_starter_lunch">
+                                            <label class="form-check-label w-100" for="passLunch">
+                                                <strong>Entry + Starter + Lunch</strong> – ₹{{ content.pricing.get('entry_plus_starter_lunch', 499) }}/person<br>
+                                                <small class="text-muted">All benefits + Full lunch included</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="passes" class="form-label">Number of Passes *</label>
+                                <select class="form-select" id="passes" name="passes" required>
+                                    <option value="1">1 Pass</option>
+                                    <option value="2">2 Passes</option>
+                                    <option value="3">3 Passes</option>
+                                    <option value="4">4 Passes</option>
+                                    <option value="5">5 Passes</option>
+                                    <option value="6">6 Passes</option>
+                                    <option value="7">7 Passes</option>
+                                    <option value="8">8 Passes</option>
+                                    <option value="9">9 Passes</option>
+                                    <option value="10">10 Passes</option>
+                                </select>
+                                <div class="form-text" id="groupDiscountText" style="display: none;">🎉 <strong>Group booking!</strong> 10% discount applied for 5+ members</div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn" style="background: linear-gradient(45deg, #ff2f92, #ffd400); border: none;">
+                                Proceed to Payment - ₹<span id="buttonTotal">200</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Booking Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h5>🎫 Pass Options</h5>
+                            <p class="mb-1 small">Entry: ₹{{ content.pricing.entry_pass }} | Entry+Starter: ₹{{ content.pricing.entry_plus_starter }} | Entry+Starter+Lunch: ₹{{ content.pricing.get('entry_plus_starter_lunch', 499) }}</p>
+                            <p class="mb-0">Selected: <strong><span id="selectedPasses">1</span> pass(es)</strong> – <span id="passTypeLabel">Entry Only</span></p>
+                            <p class="mb-0 mt-1">Subtotal: ₹<span id="subtotal">200</span> <span id="discountLine" style="display: none;">– 10% group discount</span></p>
+                            <p class="mb-0"><strong style="color: #ff2f92; font-size: 1.2em;">Total: ₹<span id="total">200</span></strong></p>
+                        </div>
+                        <h6>🎉 What's Included:</h6>
+                        <ul class="list-unstyled">
+                            <li>✅ Complimentary Organic Abir</li>
+                            <li>✅ Welcome Snacks & Beverages</li>
+                            <li>✅ Live DJ & Bollywood Music</li>
+                            <li>✅ Professional Photo Booth</li>
+                            <li>✅ Traditional Holi Activities</li>
+                            <li>✅ Rain Dance Area</li>
+                            <li>✅ Security & First Aid</li>
+                        </ul>
+                        <div class="alert alert-warning">
+                            <small><strong>📅 Event Date:</strong> {{ content.event_date }}<br>
+                            <strong>🕐 Time:</strong> {{ content.event_time }}<br>
+                            <strong>📍 Venue:</strong> {{ content.venue }}<br>
+                            <strong>🍔 Food:</strong> {{ content.pricing.food_available }}</small>
+                        </div>
+                        <p class="small text-muted">By proceeding, you agree to our terms. Instant ticket delivery via email. No refunds after payment confirmation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4 section-title">About Spectra HoliParty</h2>
+        <p class="text-center">Our <strong>2nd year</strong> of organizing HoliParty! Join us for the most colorful celebration. Experience joy, music, and the spirit of Holi!</p>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Premium Experience</h4>
+                <p>Experience the ultimate Holi celebration with premium facilities and unlimited fun. Event schedule: <strong>10:00 AM – 5:00 PM</strong>. Book your spot now!</p>
+            </div>
+            <div class="col-md-6">
+                <h4>2026 Edition</h4>
+                <p>Our 2nd year of bringing the festival of colors to the community at Mankundu Amrakunja Park.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+const PRICES = { entry: {{ content.pricing.entry_pass }}, entry_starter: {{ content.pricing.entry_plus_starter }}, entry_starter_lunch: {{ content.pricing.get('entry_plus_starter_lunch', 499) }} };
+const PASS_LABELS = { entry: 'Entry Only', entry_starter: 'Entry + Starter', entry_starter_lunch: 'Entry + Starter + Lunch' };
+
+function updateBookingTotal() {
+    const passes = parseInt(document.getElementById('passes').value) || 1;
+    const passType = document.querySelector('input[name="pass_type_radio"]:checked').value;
+    const pricePerPerson = PRICES[passType] || 200;
+    let subtotal = passes * pricePerPerson;
+    const isGroup = passes >= 5;
+    const discount = isGroup ? Math.round(subtotal * 0.1) : 0;
+    const total = subtotal - discount;
+
+    document.getElementById('pass_type').value = passType;
+    document.getElementById('amount').value = total;
+    document.getElementById('subtotal').textContent = subtotal;
+    document.getElementById('total').textContent = total;
+    document.getElementById('buttonTotal').textContent = total;
+    document.getElementById('selectedPasses').textContent = passes;
+    document.getElementById('passTypeLabel').textContent = PASS_LABELS[passType];
+    document.getElementById('groupDiscountText').style.display = isGroup ? 'block' : 'none';
+    document.getElementById('discountLine').style.display = isGroup ? 'inline' : 'none';
+}
+
+document.querySelectorAll('input[name="pass_type_radio"]').forEach(r => r.addEventListener('change', updateBookingTotal));
+document.getElementById('passes').addEventListener('change', updateBookingTotal);
+updateBookingTotal();
+
+// Form validation
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    const phone = document.getElementById('phone').value;
+    const email = document.getElementById('email').value;
+    const name = document.getElementById('name').value;
+    const address = document.getElementById('address').value;
+    
+    // Validate name
+    if (name.trim().length < 2) {
+        alert('Please enter your full name');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Validate phone
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+        alert('Please enter a valid 10-digit phone number');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Validate address
+    if (address.trim().length < 10) {
+        alert('Please enter your complete address (minimum 10 characters)');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing your booking...';
+    
+    // Form will submit normally
+});
+</script>
+{% endblock %}

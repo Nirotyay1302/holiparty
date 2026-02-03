@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">🎯 Admin Panel - Holi Party 2026</h2>
+
+    <!-- Navigation -->
+    <div class="mb-4">
+        <nav aria-label="Admin navigation">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('admin') }}">📊 Bookings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_content') }}">🎨 Content Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-danger btn-sm ms-3" href="{{ url_for('admin_login') }}">🚪 Logout</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Statistics Dashboard -->
+    <div class="admin-stats mb-4">
+        <div class="stat-card">
+            <h3>{{ bookings|length }}</h3>
+            <p>Total Bookings</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ bookings|selectattr('payment_status', 'equalto', 'Paid')|list|length }}</h3>
+            <p>Paid Bookings</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ bookings|selectattr('payment_status', 'equalto', 'Pending')|list|length + bookings|selectattr('payment_status', 'equalto', 'Awaiting Verification')|list|length }}</h3>
+            <p>Pending Payments</p>
+        </div>
+        <div class="stat-card">
+            <h3>₹{{ total_revenue }}</h3>
+            <p>Total Revenue</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name, email, or ticket ID...">
+                </div>
+                <div class="col-md-3">
+                    <select id="statusFilter" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Awaiting Verification">Awaiting Verification</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <a href="/export_bookings" class="btn btn-success w-100">📊 Export to Excel</a>
+                </div>
+                <div class="col-md-2">
+                    <button id="refreshBtn" class="btn btn-primary w-100">🔄 Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">📋 Bookings Management</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped" id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Passes</th>
+                            <th>Amount</th>
+                            <th>Ticket ID</th>
+                            <th>Payment Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr data-status="{{ booking.payment_status }}">
+                            <td>{{ booking.name }}</td>
+                            <td>{{ booking.email }}</td>
+                            <td>{{ booking.phone }}</td>
+                            <td>{{ booking.passes }}</td>
+                            <td>₹{{ booking.amount|default(booking.passes * 200) }}</td>
+                            <td><code>{{ booking.ticket_id }}</code></td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if booking.payment_status == 'Paid' else 'warning' if booking.payment_status == 'Pending' else 'info' }}">
+                                    {{ booking.payment_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm status-select" data-ticket-id="{{ booking.ticket_id }}" data-original-value="{{ booking.payment_status }}">
+                                    <option value="Pending" {{ 'selected' if booking.payment_status == 'Pending' else '' }}>Pending</option>
+                                    <option value="Awaiting Verification" {{ 'selected' if booking.payment_status == 'Awaiting Verification' else '' }}>Awaiting Verification</option>
+                                    <option value="Paid" {{ 'selected' if booking.payment_status == 'Paid' else '' }}>Paid</option>
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', filterTable);
+document.getElementById('statusFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const rows = document.querySelectorAll('#bookingsTable tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const status = row.getAttribute('data-status');
+        const matchesSearch = text.includes(searchTerm);
+        const matchesStatus = !statusFilter || status === statusFilter;
+
+        row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+    });
+}
+
+// Status update functionality
+document.querySelectorAll('.status-select').forEach(select => {
+    select.addEventListener('change', function() {
+        const ticketId = this.getAttribute('data-ticket-id');
+        const newStatus = this.value;
+
+        fetch('/update_booking_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ticket_id: ticketId,
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                this.closest('tr').setAttribute('data-status', newStatus);
+                this.setAttribute('data-original-value', newStatus);
+                const badge = this.closest('tr').querySelector('.badge');
+                badge.className = `badge bg-${newStatus === 'Paid' ? 'success' : newStatus === 'Awaiting Verification' ? 'info' : 'warning'}`;
+                badge.textContent = newStatus;
+
+                // Update statistics (simple refresh for now)
+                location.reload();
+            } else {
+                alert('Error updating status. Please try again or refresh the page.');
+                this.value = this.getAttribute('data-original-value') || 'Pending';
+            }
+        })
+        .catch(error => {
+            alert('Error updating status');
+            console.error('Error:', error);
+        });
+    });
+});
+
+// Refresh button
+document.getElementById('refreshBtn').addEventListener('click', () => {
+    location.reload();
+});
+</script>
+{% endblock %}

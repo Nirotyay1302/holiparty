@@ -1,0 +1,9 @@
+flask
+pymongo
+qrcode[pil]
+fpdf
+openpyxl
+gspread
+oauth2client
+pandas
+razorpay
