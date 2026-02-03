@@ -3,6 +3,18 @@ from config import Config
 import json
 import os
 
+# Singleton MongoDB client - reuse connection across requests
+_mongo_client = None
+
+def _get_client():
+    global _mongo_client
+    if _mongo_client is None:
+        try:
+            _mongo_client = MongoClient(Config.MONGO_URI, serverSelectionTimeoutMS=5000, maxPoolSize=10)
+        except Exception:
+            pass
+    return _mongo_client
+
 class EventContent:
     # Use JSON file as fallback when MongoDB is not available
     JSON_FILE = 'event_content.json'
@@ -34,43 +46,57 @@ class EventContent:
         ]
     }
 
+    _content_cache = None
+    _cache_time = 0
+    CACHE_TTL = 60  # seconds
+
     @classmethod
     def get_collection(cls):
         try:
-            client = MongoClient(Config.MONGO_URI, serverSelectionTimeoutMS=5000)
-            db = client.holi_party
-            # Test the connection
-            client.admin.command('ping')
-            cls.collection = db.event_content
-            return cls.collection
+            client = _get_client()
+            if client:
+                client.admin.command('ping')
+                return client.holi_party.event_content
         except Exception as e:
             print(f"MongoDB not available, using JSON fallback: {e}")
-            return None
+        return None
 
     @classmethod
     def get_content(cls):
+        import time
+        now = time.time()
+        if cls._content_cache and (now - cls._cache_time) < cls.CACHE_TTL:
+            return cls._content_cache
         collection = cls.get_collection()
         if collection is not None:
             content = collection.find_one()
             if content:
+                cls._content_cache = content
+                cls._cache_time = now
                 return content
             else:
-                # Create default content
                 cls.save_content(cls.DEFAULT_CONTENT)
+                cls._content_cache = cls.DEFAULT_CONTENT
+                cls._cache_time = now
                 return cls.DEFAULT_CONTENT
         else:
-            # Load from JSON file
             return cls._load_from_json()
+
+    @classmethod
+    def invalidate_cache(cls):
+        cls._content_cache = None
+        cls._cache_time = 0
 
     @classmethod
     def save_content(cls, content):
         collection = cls.get_collection()
         if collection is not None:
             collection.replace_one({}, content, upsert=True)
+            cls.invalidate_cache()
         else:
-            # Save to JSON file
             with open(cls.JSON_FILE, 'w') as f:
                 json.dump(content, f, indent=2)
+            cls.invalidate_cache()
 
     @classmethod
     def _load_from_json(cls):
@@ -88,15 +114,13 @@ class Booking:
     @classmethod
     def get_collection(cls):
         try:
-            client = MongoClient(Config.MONGO_URI, serverSelectionTimeoutMS=5000)
-            db = client.holi_party
-            # Test the connection
-            client.admin.command('ping')
-            cls.collection = db.bookings
-            return cls.collection
+            client = _get_client()
+            if client:
+                client.admin.command('ping')
+                return client.holi_party.bookings
         except Exception as e:
             print(f"MongoDB not available, using JSON fallback: {e}")
-            return None
+        return None
 
     def __init__(self, name, email, phone, address, passes, ticket_id, order_id, payment_status='Pending', entry_status='Not Used', pass_type='entry', amount=None, is_group_booking=False):
         self.name = name

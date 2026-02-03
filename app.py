@@ -1,16 +1,30 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from config import Config
+import uuid
+import io
+from datetime import datetime
+
+app = Flask(__name__)
+app.config.from_object(Config)
+
+# Lightweight ping - no heavy imports, for keep-alive (prevents Render sleep)
+@app.route('/ping')
+def ping():
+    return 'ok', 200
+
+@app.after_request
+def add_cache_headers(response):
+    if request.path.startswith('/static/'):
+        response.cache_control.max_age = 3600
+        response.cache_control.public = True
+    return response
+
+# Lazy imports for heavy modules (speeds up cold start)
 from models import Booking, EventContent
 from utils.email_utils import send_email
 from utils.qr_utils import generate_qr
 from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete
 from utils.ticket_utils import generate_ticket_pdf
-import uuid
-import io
-import pandas as pd
-from datetime import datetime
-app = Flask(__name__)
-app.config.from_object(Config)
 
 # Razorpay client
 # razorpay_client = razorpay.Client(auth=(app.config['RAZORPAY_KEY_ID'], app.config['RAZORPAY_KEY_SECRET']))
@@ -259,9 +273,9 @@ def admin_send_mail():
 
 @app.route('/export_bookings')
 def export_bookings():
+    import pandas as pd
     bookings = Booking.find_all()
 
-    # Convert to DataFrame
     data = []
     for booking in bookings:
         data.append({
@@ -276,13 +290,9 @@ def export_bookings():
             'Booking Date': (booking.get('_id').generation_time.replace(tzinfo=None) if booking.get('_id') else datetime.now())
         })
 
-    # Sync to Google Sheets
-    bookings_list = [[row['Name'], row['Email'], row['Phone'], row['Ticket ID'], row['Passes'], row['Amount'], row['Payment Status'], row['Entry Status'], str(row['Booking Date'])] for row in data]
-    export_to_google_sheets(bookings_list)
+    export_to_google_sheets([[row['Name'], row['Email'], row['Phone'], row['Ticket ID'], row['Passes'], row['Amount'], row['Payment Status'], row['Entry Status'], str(row['Booking Date'])] for row in data])
 
     df = pd.DataFrame(data)
-
-    # Create Excel file
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='Bookings', index=False)

@@ -1,51 +1,79 @@
-# Spectra HoliParty – Hosting Guide
+# Spectra HoliParty – Render Deployment Guide
 
-## Option 1: Render (Recommended – Free Tier)
+## Render Deployment (Step-by-Step)
 
-Render supports Python/Flask and offers a free tier.
+### 1. Push to GitHub
 
-### Steps
+```bash
+cd d:\holi
+git add .
+git commit -m "Deploy to Render"
+git push origin main
+```
 
-1. **Push code to GitHub**
-   ```bash
-   git add .
-   git commit -m "Ready for deployment"
-   git push origin main
-   ```
+### 2. Create Render Account
 
-2. **Create Render account** at [render.com](https://render.com)
+Go to [render.com](https://render.com) and sign up (GitHub login recommended).
 
-3. **New Web Service**
-   - Dashboard → **New** → **Web Service**
-   - Connect your GitHub and select **holiparty** (or your repo)
-   - Settings:
-     - **Name:** spectra-holiparty
-     - **Region:** Oregon (US West) or Singapore
-     - **Branch:** main
-     - **Runtime:** Python 3
-     - **Build command:** `pip install -r requirements.txt`
-     - **Start command:** `gunicorn app:app`
+### 3. Create Web Service
 
-4. **Environment variables** (Dashboard → Environment)
-   | Key | Value |
-   |-----|-------|
-   | `SECRET_KEY` | Random string (e.g. `openssl rand -hex 32`) |
-   | `MONGO_URI` | Your MongoDB connection string |
-   | `EMAIL_USER` | Your Gmail address |
-   | `EMAIL_PASS` | Gmail app password |
-   | `GOOGLE_SHEET_ID` | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
-   | `GOOGLE_CREDS_PATH` | `creds.json` (upload creds as Secret File) |
+1. **Dashboard** → **New** → **Web Service**
+2. Connect GitHub and select **Nirotyay1302/holiparty**
+3. Configure:
+   - **Name:** spectra-holiparty
+   - **Region:** Singapore (or Oregon for US)
+   - **Branch:** main
+   - **Runtime:** Python 3
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn app:app`
 
-5. **Google Sheets service account**
-   - Create a Secret File on Render
-   - Name: `creds.json`
-   - Upload your Google service account JSON
-   - Render will place it at `/etc/secrets/creds.json`
-   - Set: `GOOGLE_CREDS_PATH=/etc/secrets/creds.json`
+### 4. Add Environment Variables
 
-6. **Deploy**  
-   Click **Create Web Service**. After the build, your site will be live at  
-   `https://spectra-holiparty.onrender.com` (or similar).
+In **Environment** tab, add:
+
+| Key | Value |
+|-----|-------|
+| `SECRET_KEY` | Any random string (e.g. `spectra-holi-2026-secret-key-change-me`) |
+| `MONGO_URI` | `mongodb+srv://nirotyaymukherjee563_db_user:YOUR_PASSWORD@cluster0.zyixrsi.mongodb.net/?appName=Cluster0` |
+| `EMAIL_USER` | Your Gmail (e.g. yourname@gmail.com) |
+| `EMAIL_PASS` | Gmail App Password (not regular password) |
+| `GOOGLE_SHEET_ID` | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
+| `GOOGLE_CREDS_PATH` | `creds.json` |
+
+### 5. Google Sheets Credentials (Secret File)
+
+1. In your Web Service → **Environment** tab
+2. Scroll to **Secret Files**
+3. Click **Add Secret File**
+4. **Filename:** `creds.json`
+5. **Contents:** Paste your full Google service account JSON
+6. Set env var: `GOOGLE_CREDS_PATH` = `creds.json` (Render mounts it in the app root)
+
+> **Gmail App Password:** Gmail → Account → Security → 2-Step Verification → App passwords. Create one for "Mail".
+
+### 6. Deploy
+
+Click **Create Web Service**. Wait 2–3 minutes. Your site will be at:
+
+**https://spectra-holiparty.onrender.com**
+
+### 7. Free Tier Notes
+
+- Service sleeps after 15 min of no traffic (first load may take 30–60 sec)
+- 750 free hours/month
+
+### 8. Prevent Cold Starts (Keep Site Awake)
+
+Use [UptimeRobot](https://uptimerobot.com) (free):
+
+1. Create account at uptimerobot.com
+2. **Add New Monitor**
+3. **Monitor Type:** HTTP(s)
+4. **URL:** `https://YOUR-APP.onrender.com/ping`
+5. **Monitoring Interval:** 5 minutes
+6. Save
+
+This pings your site every 5 min so it never sleeps. Response is instant.
 
 ---
 
