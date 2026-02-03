@@ -34,6 +34,22 @@ def contact():
     content = EventContent.get_content()
     return render_template('contact.html', content=content)
 
+@app.route('/contact_submit', methods=['POST'])
+def contact_submit():
+    try:
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        phone = request.form.get('phone', '').strip()
+        subject = request.form.get('subject', '')
+        message = request.form.get('message', '').strip()
+        if not name or not email or not message:
+            return jsonify({'success': False, 'message': 'Please fill in all required fields.'})
+        # Store or email logic could go here; for now acknowledge receipt
+        return jsonify({'success': True, 'message': 'Thank you for your message! We will get back to you within 2 hours.'})
+    except Exception as e:
+        print(f"Contact submit error: {e}")
+        return jsonify({'success': False, 'message': 'Could not send. Please try again.'})
+
 @app.route('/booking')
 def booking():
     return redirect(url_for('home') + '#booking')

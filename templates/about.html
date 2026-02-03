@@ -23,14 +23,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="hero-image-container">
-                    <img src="https://images.unsplash.com/photo-1583163093287-1a0d5459bdce?w=600&h=400&fit=crop" alt="Holi Celebration" class="hero-image">
-                    <div class="floating-elements">
-                        <div class="floating-icon">🎨</div>
-                        <div class="floating-icon">🎵</div>
-                        <div class="floating-icon">🎪</div>
-                    </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <div class="hero-badge py-4">
+                    <span class="display-1">🎉</span>
+                    <p class="text-white-50 mb-0 mt-2">Spectra HoliParty 2026</p>
                 </div>
             </div>
         </div>
@@ -233,36 +229,6 @@
     </div>
 </section>
 
-<!-- Holi Party Photos -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">Holi Party Photos</h2>
-            <p class="lead text-muted">Glimpses of our celebrations</p>
-        </div>
-        <div class="row g-3">
-            <div class="col-6 col-md-4 col-lg-3">
-                <img src="https://images.unsplash.com/photo-1583163093287-1a0d5459bdce?w=400&h=300&fit=crop" alt="Holi celebration" class="img-fluid rounded shadow-sm holi-photo">
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <img src="https://images.unsplash.com/photo-1576018617798-17d3969b8781?w=400&h=300&fit=crop" alt="Holi colors" class="img-fluid rounded shadow-sm holi-photo">
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop" alt="Holi festival" class="img-fluid rounded shadow-sm holi-photo">
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <img src="https://images.unsplash.com/photo-1615723795498-a89ca47339c7?w=400&h=300&fit=crop" alt="Colorful Holi" class="img-fluid rounded shadow-sm holi-photo">
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <img src="https://images.unsplash.com/photo-1557683316-973673baf926?w=400&h=300&fit=crop" alt="Holi fun" class="img-fluid rounded shadow-sm holi-photo">
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop" alt="Holi colors" class="img-fluid rounded shadow-sm holi-photo">
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Testimonials -->
 <section class="py-5">
     <div class="container">
@@ -411,8 +377,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://images.unsplash.com/photo-1583163093287-1a0d5459bdce?w=1920&h=1080&fit=crop') center/cover no-repeat;
-    opacity: 0.3;
+    background: linear-gradient(135deg, rgba(102,126,234,0.6) 0%, rgba(118,75,162,0.6) 100%);
     z-index: 1;
 }
 
@@ -455,9 +420,11 @@
     letter-spacing: 1px;
 }
 
-.hero-image-container {
-    position: relative;
-    text-align: center;
+.hero-badge {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
 }
 
 .hero-image {

@@ -1,0 +1,18 @@
+# Render.com Blueprint - Spectra HoliParty
+# Deploy: Connect repo at render.com → New Web Service → Use this blueprint
+
+services:
+  - type: web
+    name: spectra-holiparty
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MONGO_URI
+      - key: EMAIL_USER
+      - key: EMAIL_PASS
+      - key: GOOGLE_SHEET_ID
+        value: 13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew
+      - key: GOOGLE_CREDS_PATH
