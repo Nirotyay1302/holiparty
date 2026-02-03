@@ -1,6 +1,6 @@
 # Spectra HoliParty 2026
 
-A complete web application for promoting and managing bookings for Spectra HoliParty – **our 2nd year** of organizing! Event at **Mankundu Amrakunja Park** | Schedule: **10:00 AM – 5:00 PM**
+A complete web application for promoting and managing bookings for Spectra HoliParty – **our 2nd year** of organizing! Event at **Amrakunja Park** | Schedule: **10:00 AM – 5:00 PM**
 
 ## Features
 

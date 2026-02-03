@@ -1,41 +1,38 @@
-# Deploy to GitHub
+# Deploy to GitHub & Netlify
 
 ## Push to https://github.com/Nirotyay1302/holiparty.git
 
-Run these commands in your project folder (`d:\holi`):
-
 ```bash
-# Initialize git (if not already)
-git init
-
-# Add all files
 git add .
-
-# Commit
-git commit -m "Spectra HoliParty 2026 - Full website with booking, UPI/QR payment, ticket system"
-
-# Add remote (if not added)
-git remote add origin https://github.com/Nirotyay1302/holiparty.git
-
-# Push to GitHub
-git branch -M main
-git push -u origin main
-```
-
-If the repo already has a remote:
-```bash
-git remote -v
+git commit -m "Spectra HoliParty 2026 - UPI/QR payment, no Razorpay"
 git push origin main
 ```
 
-## Environment Variables for Production
+## Netlify Hosting
 
-Set these when deploying (e.g., Render, Heroku):
+1. Go to [netlify.com](https://netlify.com) → Add new site → Import from Git
+2. Connect your GitHub repo: **Nirotyay1302/holiparty**
+3. Build settings: Leave default (netlify.toml is in repo)
+4. **Important:** Netlify hosts static sites. This is a **Flask app** – for booking, payment, admin, and emails you need a Python backend.
+
+### Recommended: Deploy backend to Render (free)
+
+1. Go to [render.com](https://render.com) → New Web Service
+2. Connect GitHub repo
+3. Build: `pip install -r requirements.txt`
+4. Start: `python app.py` (or use gunicorn: `gunicorn app:app`)
+5. Add environment variables (SECRET_KEY, MONGO_URI, EMAIL_USER, EMAIL_PASS, GOOGLE_SHEET_ID, GOOGLE_CREDS_PATH)
+6. Deploy – you get a URL like `https://holiparty.onrender.com`
+
+Then either:
+- Use the Render URL directly (full site), OR
+- Host static pages on Netlify and point forms to your Render backend URL
+
+## Environment Variables
+
 - `SECRET_KEY` - Random secret for sessions
 - `MONGO_URI` - MongoDB connection string
-- `RAZORPAY_KEY_ID` - Razorpay key
-- `RAZORPAY_KEY_SECRET` - Razorpay secret
 - `EMAIL_USER` - Gmail for sending tickets
 - `EMAIL_PASS` - Gmail app password
-- `GOOGLE_SHEET_ID` - 13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew (spectra holi sheet)
-- `GOOGLE_CREDS_PATH` - Path to creds.json (or use service account JSON as env)
+- `GOOGLE_SHEET_ID` - 13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew
+- `GOOGLE_CREDS_PATH` - creds.json path

@@ -1,0 +1,14 @@
+# Spectra HoliParty - Netlify Configuration
+# Note: This is a Flask (Python) app. Netlify primarily hosts static sites.
+# For full functionality, deploy the backend to Render (https://render.com) - free tier supports Python/Flask.
+# Then update the API URL in your frontend or use Netlify for static assets only.
+
+[build]
+  command = "echo 'Backend: Deploy Flask app to Render.com for full booking/payment functionality'"
+  publish = "."
+
+# Redirect all routes to index for SPA-style (if using static export)
+# [[redirects]]
+#   from = "/*"
+#   to = "/index.html"
+#   status = 200

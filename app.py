@@ -9,8 +9,6 @@ import uuid
 import io
 import pandas as pd
 from datetime import datetime
-import razorpay
-
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -80,27 +78,8 @@ def create_order():
 
     print(f"Booking saved with ticket_id: {ticket_id}")
 
-    # Create Razorpay order
-    try:
-        razorpay_client = razorpay.Client(auth=(app.config['RAZORPAY_KEY_ID'], app.config['RAZORPAY_KEY_SECRET']))
-        razorpay_order = razorpay_client.order.create({
-            'amount': amount * 100,  # Amount in paisa
-            'currency': 'INR',
-            'payment_capture': '1'  # Auto capture
-        })
-        print(f"Razorpay order created: {razorpay_order['id']}")
-    except Exception as e:
-        print(f"Razorpay error: {e}")
-        # Fallback to test order
-        razorpay_order = {'id': 'test_order_' + ticket_id}
-
-    # Update booking with razorpay order id
-    Booking.update_one({'ticket_id': ticket_id}, {'$set': {'razorpay_order_id': razorpay_order['id']}})
-
     print("Redirecting to payment")
-
-    # Redirect to payment page with data
-    return redirect(url_for('payment', ticket_id=ticket_id, amount=amount, name=name, passes=passes, order_id=razorpay_order['id'], pass_type=pass_type))
+    return redirect(url_for('payment', ticket_id=ticket_id, amount=amount, name=name, passes=passes, pass_type=pass_type))
 
 @app.route('/payment')
 def payment():
@@ -108,65 +87,8 @@ def payment():
     amount = int(request.args.get('amount', 0))
     name = request.args.get('name')
     passes = int(request.args.get('passes', 0))
-    order_id = request.args.get('order_id')
     pass_type = request.args.get('pass_type', 'entry')
-
-    return render_template('payment.html', ticket_id=ticket_id, amount=amount, name=name, passes=passes, order_id=order_id, pass_type=pass_type, razorpay_key=app.config['RAZORPAY_KEY_ID'])
-
-@app.route('/payment_success', methods=['POST'])
-def payment_success():
-    data = request.get_json()
-    ticket_id = data.get('ticket_id')
-    payment_id = data.get('razorpay_payment_id')
-    order_id = data.get('razorpay_order_id')
-    signature = data.get('razorpay_signature')
-
-    # Verify payment signature
-    # params_dict = {
-    #     'razorpay_order_id': order_id,
-    #     'razorpay_payment_id': payment_id,
-    #     'razorpay_signature': signature
-    # }
-
-    # Verify payment signature
-    if not order_id.startswith('test_'):
-        razorpay_client = razorpay.Client(auth=(app.config['RAZORPAY_KEY_ID'], app.config['RAZORPAY_KEY_SECRET']))
-        params_dict = {
-            'razorpay_order_id': order_id,
-            'razorpay_payment_id': payment_id,
-            'razorpay_signature': signature
-        }
-
-        try:
-            razorpay_client.utility.verify_payment_signature(params_dict)
-        except:
-            return jsonify({'success': False})
-    
-    # Payment verified, update status and send ticket
-    booking = Booking.find_one(ticket_id=ticket_id)
-    if booking:
-        content = EventContent.get_content()
-        venue = content.get('venue', 'Mankundu Amrakunja Park')
-        booking_with_venue = {**booking, 'venue': venue}
-        Booking.update_one({'ticket_id': ticket_id}, {'$set': {'payment_status': 'Paid', 'razorpay_payment_id': payment_id}})
-
-        try:
-            pdf_buf = generate_ticket_pdf(booking_with_venue)
-            body = f"""
-            <h2>Dear {booking['name']},</h2>
-            <p>Thank you for your payment! Your <strong>Spectra HoliParty 2026</strong> entry pass is confirmed.</p>
-            <p>Your ticket is attached with your <strong>Ticket ID: {booking['ticket_id']}</strong> and <strong>Amount: ₹{booking.get('amount', booking['passes'] * 200)}</strong>.</p>
-            <p>Show the QR code at the gate for entry. Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
-            """
-            send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
-        except Exception as e:
-            print(f"Ticket/email send error: {e}")
-
-        booking_amount = booking.get('amount', booking['passes'] * 200)
-        from datetime import datetime
-        update_sheet([booking['name'], booking['email'], booking['phone'], booking['ticket_id'], booking['passes'], booking_amount, 'Paid', 'Not Used', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
-
-    return jsonify({'success': True})
+    return render_template('payment.html', ticket_id=ticket_id, amount=amount, name=name, passes=passes, pass_type=pass_type)
 
 @app.route('/confirm_payment', methods=['POST'])
 def confirm_payment():
@@ -206,7 +128,7 @@ def update_booking_status():
             # If status changed to Paid and wasn't before, send ticket
             if new_status == 'Paid' and old_status != 'Paid':
                 content = EventContent.get_content()
-                venue = content.get('venue', 'Mankundu Amrakunja Park')
+                venue = content.get('venue', 'Amrakunja Park')
                 booking_with_venue = {**booking, 'venue': venue}
                 try:
                     pdf_buf = generate_ticket_pdf(booking_with_venue)

@@ -7,8 +7,7 @@ class Config:
         'db': 'holi_party',
         'host': os.environ.get('MONGO_URI') or 'mongodb+srv://nirotyaymukherjee563_db_user:U9dbgw3jvJTUUJnw@cluster0.zyixrsi.mongodb.net/'
     }
-    RAZORPAY_KEY_ID = 'rzp_test_SBY1cIA6tBEKpN'
-    RAZORPAY_KEY_SECRET = 'JEsj6m763sTNgiALdpOeZxpq'
+    # Razorpay removed - UPI/QR payment only
     EMAIL_USER = os.environ.get('EMAIL_USER')
     EMAIL_PASS = os.environ.get('EMAIL_PASS')
     GOOGLE_SHEET_ID = os.environ.get('GOOGLE_SHEET_ID') or '13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew'

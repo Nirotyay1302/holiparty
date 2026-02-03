@@ -262,24 +262,6 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-.transport-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.transport-card:hover {
-    transform: translateY(-5px);
-}
-
-.transport-icon {
-    font-size: 2rem;
-    color: #ff2f92;
-    margin-bottom: 1rem;
-}
-
 .accordion-item {
     background: white;
     border: 1px solid #e9ecef;
@@ -624,50 +606,19 @@ contactMessage.addEventListener('input', function() {
                 </div>
                 <div class="map-container rounded shadow overflow-hidden">
                     <iframe
-                        src="https://maps.google.com/maps?q=Mankundu+Amrakunja+Park&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        src="https://maps.google.com/maps?q=Amrakunja+Park&t=&z=15&ie=UTF8&iwloc=&output=embed"
                         width="100%"
                         height="450"
                         style="border:0;"
                         allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
-                        title="Mankundu Amrakunja Park - Event Venue">
+                        title="Amrakunja Park - Event Venue">
                     </iframe>
                     <div class="map-overlay-link">
-                        <a href="https://www.google.com/maps/search/Mankundu+Amrakunja+Park" target="_blank" rel="noopener" class="btn btn-sm btn-light shadow">
+                        <a href="https://www.google.com/maps/search/Amrakunja+Park" target="_blank" rel="noopener" class="btn btn-sm btn-light shadow">
                             <i class="fas fa-external-link-alt me-1"></i>Open in Google Maps
                         </a>
-                    </div>
-                </div>
-
-                <!-- Transportation Info -->
-                <div class="row mt-4 g-4">
-                    <div class="col-md-4">
-                        <div class="transport-card text-center">
-                            <div class="transport-icon">
-                                <i class="fas fa-car"></i>
-                            </div>
-                            <h6>By Car</h6>
-                            <p class="small">Ample parking available. Valet service ₹50</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="transport-card text-center">
-                            <div class="transport-icon">
-                                <i class="fas fa-bus"></i>
-                            </div>
-                            <h6>By Public Transport</h6>
-                            <p class="small">Bus stop 2 mins walk. Metro station 5 mins</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="transport-card text-center">
-                            <div class="transport-icon">
-                                <i class="fas fa-taxi"></i>
-                            </div>
-                            <h6>By Taxi/Rideshare</h6>
-                            <p class="small">Uber/Ola available. Drop-off at main gate</p>
-                        </div>
                     </div>
                 </div>
             </div>

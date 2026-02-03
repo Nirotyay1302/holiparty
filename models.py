@@ -10,7 +10,7 @@ class EventContent:
     DEFAULT_CONTENT = {
         'event_date': 'March 4, 2026',
         'event_time': '10:00 AM – 5:00 PM',
-        'venue': 'Mankundu Amrakunja Park',
+        'venue': 'Amrakunja Park',
         'organizer': 'Spectra Group',
         'contact_persons': [
             {'name': 'Nirotyay Mukherjee', 'phone': '7278737263'},

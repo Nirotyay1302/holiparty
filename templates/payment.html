@@ -6,7 +6,8 @@
         <div class="col-md-10">
             <div class="card shadow mb-4">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3>💳 Complete Your Payment – ₹{{ amount }}</h3>
+                    <h3>💳 Pay via UPI – ₹{{ amount }}</h3>
+                    <p class="mb-0 small">Ticket & email will be sent only after admin confirms your payment</p>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
@@ -21,145 +22,72 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 text-center">
-                            <h5>Pay via Card / UPI (Razorpay)</h5>
-                            <button id="rzp-button1" class="btn btn-success btn-lg mb-2">💰 Pay ₹{{ amount }}</button>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-                    <h5 class="text-center mb-3">– OR –</h5>
-
-                    <!-- UPI / QR Code Payment -->
-                    <div class="row align-items-center">
-                        <div class="col-md-5 text-center">
-                            <div class="card border-success">
-                                <div class="card-body">
+                        <div class="col-md-6">
+                            <!-- UPI / QR Code Payment -->
+                            <div class="card border-success h-100">
+                                <div class="card-body text-center">
                                     <h6 class="text-success mb-2">Scan QR to pay via UPI</h6>
-                                    <img src="{{ url_for('static', filename='images/upi-qr.png') }}" alt="UPI QR Code" class="img-fluid" style="max-width: 220px;">
-                                    <p class="mb-0 mt-2 small fw-bold">Nirotyay Mukherjee</p>
+                                    <img src="{{ url_for('static', filename='images/upi-qr.png') }}" alt="UPI QR Code" class="img-fluid" style="max-width: 200px;">
+                                    <p class="mb-0 mt-2 fw-bold">Nirotyay Mukherjee</p>
                                     <p class="text-muted small mb-2">7278737263@jio</p>
-                                    <p class="small text-muted">Use any UPI app: GPay, PhonePe, Paytm, BHIM</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <span class="text-muted">or</span>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h6 class="mb-2">Pay via UPI ID</h6>
-                                    <div class="input-group mb-2">
-                                        <input type="text" class="form-control" value="7278737263@jio" id="upiId" readonly>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" value="7278737263@jio" readonly>
                                         <button class="btn btn-outline-primary" type="button" onclick="navigator.clipboard.writeText('7278737263@jio'); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy', 2000)">Copy</button>
                                     </div>
-                                    <p class="small text-muted mb-3">Send exactly ₹{{ amount }} and add Ticket ID <strong>{{ ticket_id }}</strong> in the payment note/reference.</p>
+                                    <p class="small text-muted mt-2 mb-2">Pay exactly ₹{{ amount }}. Add Ticket ID <strong>{{ ticket_id }}</strong> in payment note.</p>
                                     <form action="/confirm_payment" method="POST">
                                         <input type="hidden" name="ticket_id" value="{{ ticket_id }}">
                                         <button type="submit" class="btn btn-warning w-100" id="upiConfirmBtn">
                                             ✓ I've paid via UPI / QR
                                         </button>
                                     </form>
-                                    <p class="small text-muted mt-2 mb-0">Status: Awaiting Verification. Admin will confirm and email your ticket.</p>
+                                    <p class="small text-muted mt-2 mb-0">Admin will verify & email your ticket.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Payment Instructions</h5>
-                    <ol class="text-start">
-                        <li><strong>Razorpay:</strong> Click "Pay ₹{{ amount }}" for instant card/UPI payment. Ticket is emailed automatically.</li>
-                        <li><strong>UPI/QR:</strong> Scan the QR or use UPI ID 7278737263@jio. Pay exactly ₹{{ amount }} and add Ticket ID <strong>{{ ticket_id }}</strong> in the payment note. Then click "I've paid via UPI". Admin will verify and email your ticket.</li>
-                    </ol>
-                    <p class="mt-3 text-muted small">Your ticket will be sent to your email after payment verification.</p>
+                    <!-- Demo Ticket Preview (as per ₹200 criteria) -->
+                    <div class="card border-2 border-primary mt-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">📋 Demo Ticket Preview (Sample – ₹200 Entry)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="demo-ticket p-4 rounded" style="background: linear-gradient(135deg, #fff8f0 0%, #fff 100%); border: 2px dashed #ff2f92;">
+                                <div class="text-center mb-3">
+                                    <strong class="text-primary">SPECTRA HOLIPARTY 2026</strong><br>
+                                    <small>Entry Ticket</small>
+                                </div>
+                                <div class="row small">
+                                    <div class="col-6"><strong>Name:</strong> Sample User</div>
+                                    <div class="col-6"><strong>Ticket ID:</strong> XXXXXXXX</div>
+                                    <div class="col-12 mt-2"><strong class="bg-warning px-2 py-1 rounded">Amount Paid: ₹200</strong></div>
+                                    <div class="col-6 mt-2"><strong>Passes:</strong> 1 | Entry Only</div>
+                                    <div class="col-6 mt-2"><strong>Venue:</strong> Amrakunja Park</div>
+                                    <div class="col-12 mt-2"><strong>Date:</strong> March 4, 2026 | 10:00 AM - 5:00 PM</div>
+                                    <div class="col-12 mt-2 text-center">
+                                        <div class="d-inline-block bg-secondary text-white px-3 py-2 rounded">[QR Code]</div>
+                                    </div>
+                                </div>
+                                <p class="small text-muted text-center mt-2 mb-0">Your actual ticket will be emailed after admin confirms payment.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow mt-4">
+                        <div class="card-body">
+                            <h6>Payment Instructions</h6>
+                            <ol class="mb-0">
+                                <li>Scan the QR code or use UPI ID <strong>7278737263@jio</strong></li>
+                                <li>Send exactly <strong>₹{{ amount }}</strong> and add <strong>Ticket ID: {{ ticket_id }}</strong> in the payment note</li>
+                                <li>Click "I've paid via UPI / QR" after payment</li>
+                                <li>Admin will verify and email your ticket. No ticket until admin confirms as Paid.</li>
+                            </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-var options = {
-    "key": "{{ razorpay_key }}",
-    "amount": {{ amount * 100 }},
-    "currency": "INR",
-    "name": "Holi Party 2026",
-    "description": "Entry Pass for {{ passes }} people",
-    "order_id": "{{ order_id }}",
-    "handler": function (response){
-        // Handle success
-        fetch('/payment_success', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                ticket_id: "{{ ticket_id }}"
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.success) {
-                window.location.href = '/success';
-            } else {
-                alert('Payment verification failed');
-            }
-        });
-    },
-    "prefill": {
-        "name": "{{ name }}",
-        "email": "",
-        "contact": ""
-    },
-    "theme": {
-        "color": "#3399cc"
-    }
-};
-var rzp1 = new Razorpay(options);
-document.getElementById('rzp-button1').onclick = function(e){
-    if ("{{ order_id }}".startsWith('test_')) {
-        // For test orders, simulate payment success
-        fetch('/payment_success', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                razorpay_payment_id: 'test_payment_' + "{{ ticket_id }}",
-                razorpay_order_id: "{{ order_id }}",
-                razorpay_signature: 'test_signature',
-                ticket_id: "{{ ticket_id }}"
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.success) {
-                window.location.href = '/success';
-            } else {
-                alert('Payment verification failed');
-            }
-        });
-    } else {
-        rzp1.open();
-    }
-    e.preventDefault();
-}
-
-{% if order_id.startswith('test_') %}
-// For test orders, automatically "pay" after 3 seconds with loading indicator
-document.getElementById('rzp-button1').innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing Payment...';
-setTimeout(function() {
-    document.getElementById('rzp-button1').click();
-}, 3000);
-{% endif %}
-</script>
 {% endblock %}
