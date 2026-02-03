@@ -3,7 +3,7 @@ from config import Config
 from models import Booking, EventContent
 from utils.email_utils import send_email
 from utils.qr_utils import generate_qr
-from utils.excel_utils import update_sheet, export_to_google_sheets
+from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete
 from utils.ticket_utils import generate_ticket_pdf
 import uuid
 import io
@@ -178,6 +178,68 @@ def admin_content():
     
     content = EventContent.get_content()
     return render_template('admin_content.html', content=content)
+
+@app.route('/delete_booking', methods=['POST'])
+def delete_booking():
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False})
+    try:
+        data = request.get_json()
+        ticket_id = data.get('ticket_id')
+        if not ticket_id:
+            return jsonify({'success': False})
+        result = Booking.delete_one({'ticket_id': ticket_id})
+        if getattr(result, 'deleted_count', 0) > 0:
+            remaining = Booking.find_all()
+            sync_sheet_after_delete(remaining)
+            return jsonify({'success': True})
+        return jsonify({'success': False})
+    except Exception as e:
+        print(f"Delete booking error: {e}")
+        return jsonify({'success': False})
+
+@app.route('/admin_send_mail', methods=['POST'])
+def admin_send_mail():
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False})
+    try:
+        data = request.get_json()
+        ticket_id = data.get('ticket_id')
+        mail_type = data.get('mail_type')  # 'success' or 'failure'
+        if not ticket_id or mail_type not in ('success', 'failure'):
+            return jsonify({'success': False})
+        booking = Booking.find_one(ticket_id=ticket_id)
+        if not booking:
+            return jsonify({'success': False})
+        content = EventContent.get_content()
+        venue = content.get('venue', 'Amrakunja Park')
+        booking_with_venue = {**booking, 'venue': venue}
+        if mail_type == 'success':
+            pdf_buf = generate_ticket_pdf(booking_with_venue)
+            body = f"""
+            <h2>Dear {booking['name']},</h2>
+            <p>Greetings from <strong>Spectra Team</strong>!</p>
+            <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is confirmed.</p>
+            <p>Your ticket is attached with <strong>Ticket ID: {booking['ticket_id']}</strong> and <strong>Amount: ₹{booking.get('amount', booking['passes'] * 200)}</strong>.</p>
+            <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
+            <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
+            <p>— Spectra HoliParty Team</p>
+            """
+            send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+        else:
+            body = f"""
+            <h2>Dear {booking['name']},</h2>
+            <p>Greetings from <strong>Spectra Team</strong>!</p>
+            <p>We noticed your booking for <strong>Spectra HoliParty 2026</strong> (Ticket ID: {booking['ticket_id']}) could not be confirmed due to payment verification issues.</p>
+            <p>If you have already made the payment, please contact us with your Ticket ID for manual verification.</p>
+            <p>For any queries, reach us at the numbers on our website.</p>
+            <p>— Spectra HoliParty Team</p>
+            """
+            send_email(booking['email'], "Spectra HoliParty 2026 - Payment Verification Required", body)
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Admin send mail error: {e}")
+        return jsonify({'success': False})
 
 @app.route('/export_bookings')
 def export_bookings():

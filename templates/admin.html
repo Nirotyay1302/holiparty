@@ -83,6 +83,7 @@
                             <th>Amount</th>
                             <th>Ticket ID</th>
                             <th>Payment Status</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -106,6 +107,13 @@
                                     <option value="Awaiting Verification" {{ 'selected' if booking.payment_status == 'Awaiting Verification' else '' }}>Awaiting Verification</option>
                                     <option value="Paid" {{ 'selected' if booking.payment_status == 'Paid' else '' }}>Paid</option>
                                 </select>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <button type="button" class="btn btn-outline-success btn-sm mail-btn" data-ticket-id="{{ booking.ticket_id }}" data-mail-type="success" title="Send success mail with ticket">📧 Success</button>
+                                    <button type="button" class="btn btn-outline-warning btn-sm mail-btn" data-ticket-id="{{ booking.ticket_id }}" data-mail-type="failure" title="Send failure mail">📧 Failure</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-ticket-id="{{ booking.ticket_id }}" title="Delete user">🗑</button>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -178,6 +186,52 @@ document.querySelectorAll('.status-select').forEach(select => {
 // Refresh button
 document.getElementById('refreshBtn').addEventListener('click', () => {
     location.reload();
+});
+
+// Delete booking
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const ticketId = this.getAttribute('data-ticket-id');
+        if (!confirm('Delete this booking? Sheet will be updated.')) return;
+        fetch('/delete_booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket_id: ticketId })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                this.closest('tr').remove();
+            } else {
+                alert('Delete failed.');
+            }
+        });
+    });
+});
+
+// Send mail (success/failure)
+document.querySelectorAll('.mail-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const ticketId = this.getAttribute('data-ticket-id');
+        const mailType = this.getAttribute('data-mail-type');
+        const label = mailType === 'success' ? 'Success + Ticket' : 'Failure';
+        if (!confirm(`Send ${label} mail to this user?`)) return;
+        const orig = this.textContent;
+        this.disabled = true;
+        this.textContent = 'Sending...';
+        fetch('/admin_send_mail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket_id: ticketId, mail_type: mailType })
+        })
+        .then(r => r.json())
+        .then(data => {
+            this.disabled = false;
+            this.textContent = orig;
+            alert(data.success ? 'Mail sent!' : 'Failed to send.');
+        })
+        .catch(() => { this.disabled = false; this.textContent = orig; });
+    });
 });
 </script>
 {% endblock %}

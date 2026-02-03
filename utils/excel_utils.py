@@ -18,6 +18,25 @@ def update_sheet(data):
     except Exception as e:
         print(f"Sheet update failed: {e}")
 
+def sync_sheet_after_delete(bookings):
+    """Re-export sheet with current bookings after a delete."""
+    from datetime import datetime
+    data = []
+    for b in bookings:
+        bid = b.get('_id')
+        bdate = ''
+        if bid and hasattr(bid, 'generation_time'):
+            try:
+                bdate = bid.generation_time.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                bdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            bdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        data.append([b.get('name'), b.get('email'), b.get('phone'), b.get('ticket_id'), b.get('passes'),
+                    b.get('amount', b.get('passes', 0) * 200), b.get('payment_status'),
+                    b.get('entry_status', 'Not Used'), bdate])
+    return export_to_google_sheets(data)
+
 def export_to_google_sheets(bookings_data):
     if not Config.GOOGLE_CREDS_PATH or not Config.GOOGLE_SHEET_ID:
         print("Google Sheets not configured.")

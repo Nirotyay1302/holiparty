@@ -18,7 +18,7 @@ class EventContent:
         ],
         'pricing': {
             'entry_pass': 200,
-            'entry_plus_starter': 349,
+            'entry_plus_starter': 350,
             'entry_plus_starter_lunch': 499,
             'food_available': 'Veg and Non-Veg options available at counters'
         },
@@ -163,6 +163,21 @@ class Booking:
                         json.dump(bookings, f, indent=2, default=str)
                     return type('Result', (), {'modified_count': 1})()
             return type('Result', (), {'modified_count': 0})()
+
+    @classmethod
+    def delete_one(cls, filter_dict):
+        collection = cls.get_collection()
+        if collection is not None:
+            return collection.delete_one(filter_dict)
+        else:
+            bookings = cls._load_from_json()
+            for i, booking in enumerate(bookings):
+                if all(booking.get(k) == v for k, v in filter_dict.items()):
+                    bookings.pop(i)
+                    with open(cls.JSON_FILE, 'w') as f:
+                        json.dump(bookings, f, indent=2, default=str)
+                    return type('Result', (), {'deleted_count': 1})()
+            return type('Result', (), {'deleted_count': 0})()
 
     @classmethod
     def _load_from_json(cls):

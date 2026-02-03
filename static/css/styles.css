@@ -990,6 +990,14 @@ html {
     }
 }
 
+.holi-photo {
+    transition: transform 0.2s;
+    object-fit: cover;
+}
+.holi-photo:hover {
+    transform: scale(1.03);
+}
+
 /* Card responsiveness */
 @media (max-width: 576px) {
     .card {
