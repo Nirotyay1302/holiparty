@@ -23,7 +23,7 @@ def add_cache_headers(response):
 from models import Booking, EventContent
 from utils.email_utils import send_email
 from utils.qr_utils import generate_qr
-from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete, upsert_booking_row
+from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete, upsert_booking_row, delete_booking_from_sheet
 from utils.ticket_utils import generate_ticket_pdf
 
 # Razorpay client
@@ -238,15 +238,33 @@ def delete_booking():
         ticket_id = data.get('ticket_id')
         if not ticket_id:
             return jsonify({'success': False})
+        
+        # Delete from Mongo/JSON
         result = Booking.delete_one({'ticket_id': ticket_id})
-        if getattr(result, 'deleted_count', 0) > 0:
-            remaining = Booking.find_all()
-            sync_sheet_after_delete(remaining)
+        deleted_count = getattr(result, 'deleted_count', 0)
+        
+        # Also delete from Google Sheet (persistent store)
+        try:
+            delete_booking_from_sheet(ticket_id)
+        except Exception as e:
+            print(f"Sheet delete failed (non-fatal): {e}")
+        
+        # If deleted from primary store, return success
+        if deleted_count > 0:
             return jsonify({'success': True})
-        return jsonify({'success': False})
+        
+        # If not found in primary store, still try to delete from sheet
+        # (handles case where booking only exists in sheet)
+        sheet_deleted = delete_booking_from_sheet(ticket_id)
+        if sheet_deleted:
+            return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'message': 'Booking not found'})
     except Exception as e:
         print(f"Delete booking error: {e}")
-        return jsonify({'success': False})
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/admin_send_mail', methods=['POST'])
 def admin_send_mail():

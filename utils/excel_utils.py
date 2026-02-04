@@ -136,6 +136,29 @@ def read_bookings_from_google_sheet():
         traceback.print_exc()
         return []
 
+def delete_booking_from_sheet(ticket_id):
+    """Delete a booking row from Google Sheet by Ticket ID."""
+    worksheet = _get_worksheet()
+    if worksheet is None:
+        return False
+    try:
+        # Find ticket id in column D (Ticket ID)
+        all_values = worksheet.col_values(4)  # Column D = Ticket ID
+        row_num = None
+        for idx, val in enumerate(all_values, start=1):
+            if idx > 1 and str(val).strip().upper() == str(ticket_id).strip().upper():
+                row_num = idx
+                break
+        
+        if row_num and row_num > 1:
+            worksheet.delete_rows(row_num)
+            print(f"Deleted booking {ticket_id} from sheet (row {row_num})")
+            return True
+        return False
+    except Exception as e:
+        print(f"Sheet delete failed: {e}")
+        return False
+
 def sync_sheet_after_delete(bookings):
     """Re-export sheet with current bookings after a delete."""
     from datetime import datetime
@@ -149,10 +172,10 @@ def sync_sheet_after_delete(bookings):
             except Exception:
                 bdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         else:
-            bdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            bdate = b.get('booking_date', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         data.append([b.get('name'), b.get('email'), b.get('phone'), b.get('ticket_id'), b.get('passes'),
                     b.get('amount', b.get('passes', 0) * 200), b.get('payment_status'),
-                    b.get('entry_status', 'Not Used'), bdate])
+                    b.get('entry_status', 'Not Used'), bdate, b.get('pass_type', 'entry')])
     return export_to_google_sheets(data)
 
 def export_to_google_sheets(bookings_data):
