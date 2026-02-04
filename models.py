@@ -75,7 +75,8 @@ def _get_client():
 
             _mongo_client = MongoClient(
                 Config.MONGO_URI,
-                serverSelectionTimeoutMS=5000,
+                # Faster failover to JSON fallback keeps site responsive
+                serverSelectionTimeoutMS=1500,
                 connectTimeoutMS=20000,
                 socketTimeoutMS=20000,
                 maxPoolSize=10,
@@ -163,7 +164,11 @@ class EventContent:
                 cls._cache_time = now
                 return cls.DEFAULT_CONTENT
         else:
-            return cls._load_from_json()
+            # Cache JSON fallback too (avoids repeated DB attempts on each request)
+            content = cls._load_from_json()
+            cls._content_cache = content
+            cls._cache_time = now
+            return content
 
     @classmethod
     def invalidate_cache(cls):
