@@ -5,12 +5,88 @@ import os
 
 # Singleton MongoDB client - reuse connection across requests
 _mongo_client = None
+_mongo_disabled_until = 0  # epoch seconds; backoff when Mongo is failing
+
+def _deep_merge_keep_existing(base, updates):
+    """
+    Deep merge dictionaries without deleting existing data.
+    - Empty strings / None / empty dicts are ignored (keep previous value)
+    - Empty lists are ignored (keep previous value)
+    - Non-empty lists replace previous lists
+    """
+    if not isinstance(base, dict) or not isinstance(updates, dict):
+        return updates
+
+    merged = dict(base)
+    for k, v in updates.items():
+        if k == "_id":
+            continue
+        if v is None:
+            continue
+        if isinstance(v, str) and v.strip() == "":
+            continue
+        if isinstance(v, dict):
+            if not v:
+                continue
+            merged[k] = _deep_merge_keep_existing(base.get(k, {}) if isinstance(base.get(k), dict) else {}, v)
+            continue
+        if isinstance(v, list):
+            if not v:
+                continue
+            # if list is only empty strings, ignore
+            if all((isinstance(i, str) and i.strip() == "") for i in v):
+                continue
+            merged[k] = v
+            continue
+        merged[k] = v
+    return merged
+
+def _strip_mongo_id(doc):
+    if isinstance(doc, dict) and "_id" in doc:
+        doc = dict(doc)
+        doc.pop("_id", None)
+    return doc
 
 def _get_client():
     global _mongo_client
+    global _mongo_disabled_until
+
+    # When Mongo is down (TLS, network, auth), avoid blocking every request.
+    try:
+        import time
+        if _mongo_disabled_until and time.time() < _mongo_disabled_until:
+            return None
+    except Exception:
+        pass
+
     if _mongo_client is None:
         try:
-            _mongo_client = MongoClient(Config.MONGO_URI, serverSelectionTimeoutMS=5000, maxPoolSize=10)
+            if not getattr(Config, "MONGO_URI", None):
+                return None
+
+            # TLS hardening for Atlas + Render. Using certifi avoids missing/old CA bundles.
+            tls_kwargs = {}
+            try:
+                import certifi  # type: ignore
+                tls_kwargs["tlsCAFile"] = certifi.where()
+            except Exception:
+                # If certifi isn't available, fall back to system CA.
+                tls_kwargs = {}
+
+            _mongo_client = MongoClient(
+                Config.MONGO_URI,
+                serverSelectionTimeoutMS=5000,
+                connectTimeoutMS=20000,
+                socketTimeoutMS=20000,
+                maxPoolSize=10,
+                tls=True,
+                **tls_kwargs,
+            )
+            # Re-enable Mongo on successful client init
+            try:
+                _mongo_disabled_until = 0
+            except Exception:
+                pass
         except Exception:
             pass
     return _mongo_client
@@ -48,7 +124,7 @@ class EventContent:
 
     _content_cache = None
     _cache_time = 0
-    CACHE_TTL = 60  # seconds
+    CACHE_TTL = 300  # seconds (admin updates invalidate cache immediately)
 
     @classmethod
     def get_collection(cls):
@@ -59,6 +135,13 @@ class EventContent:
                 return client.holi_party.event_content
         except Exception as e:
             print(f"MongoDB not available, using JSON fallback: {e}")
+            # Backoff to keep website responsive if Mongo is down
+            try:
+                import time
+                global _mongo_disabled_until
+                _mongo_disabled_until = time.time() + 60
+            except Exception:
+                pass
         return None
 
     @classmethod
@@ -91,11 +174,18 @@ class EventContent:
     def save_content(cls, content):
         collection = cls.get_collection()
         if collection is not None:
-            collection.replace_one({}, content, upsert=True)
+            # Merge with existing record to avoid deleting previous data
+            existing = _strip_mongo_id(collection.find_one() or {})
+            merged = _deep_merge_keep_existing(existing, _strip_mongo_id(content or {}))
+            collection.replace_one({}, merged, upsert=True)
             cls.invalidate_cache()
         else:
+            # Merge with existing JSON to avoid deleting previous data
+            existing = cls._load_from_json() if os.path.exists(cls.JSON_FILE) else {}
+            existing = _strip_mongo_id(existing or {})
+            merged = _deep_merge_keep_existing(existing, _strip_mongo_id(content or {}))
             with open(cls.JSON_FILE, 'w') as f:
-                json.dump(content, f, indent=2)
+                json.dump(merged, f, indent=2)
             cls.invalidate_cache()
 
     @classmethod
@@ -120,6 +210,13 @@ class Booking:
                 return client.holi_party.bookings
         except Exception as e:
             print(f"MongoDB not available, using JSON fallback: {e}")
+            # Backoff to keep website responsive if Mongo is down
+            try:
+                import time
+                global _mongo_disabled_until
+                _mongo_disabled_until = time.time() + 60
+            except Exception:
+                pass
         return None
 
     def __init__(self, name, email, phone, address, passes, ticket_id, order_id, payment_status='Pending', entry_status='Not Used', pass_type='entry', amount=None, is_group_booking=False):

@@ -187,7 +187,8 @@ def admin_content():
         return redirect(url_for('admin_login'))
     
     if request.method == 'POST':
-        # Update event content
+        # Update event content (do NOT delete existing fields; models.EventContent merges safely)
+        gallery_images = [x.strip() for x in request.form.getlist('gallery_images[]') if str(x).strip()]
         content = {
             'event_date': request.form['event_date'],
             'event_time': request.form['event_time'],
@@ -202,7 +203,8 @@ def admin_content():
             },
             'offers': request.form['offers'],
             'hero_image': request.form['hero_image'],
-            'gallery_images': request.form.getlist('gallery_images[]')
+            # Only overwrite gallery if non-empty list was provided
+            'gallery_images': gallery_images
         }
         EventContent.save_content(content)
         flash('Content updated successfully!', 'success')

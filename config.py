@@ -2,10 +2,12 @@ import os
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key-change-this'
-    MONGO_URI = os.environ.get('MONGO_URI') or 'mongodb+srv://nirotyaymukherjee563_db_user:U9dbgw3jvJTUUJnw@cluster0.zyixrsi.mongodb.net/'
+    # IMPORTANT: Never hardcode credentials in source code.
+    # Set MONGO_URI in your hosting provider / environment variables.
+    MONGO_URI = (os.environ.get('MONGO_URI') or '').strip()
     MONGODB_SETTINGS = {
         'db': 'holi_party',
-        'host': os.environ.get('MONGO_URI') or 'mongodb+srv://nirotyaymukherjee563_db_user:U9dbgw3jvJTUUJnw@cluster0.zyixrsi.mongodb.net/'
+        'host': (os.environ.get('MONGO_URI') or '').strip()
     }
     # Razorpay removed - UPI/QR payment only
     EMAIL_USER = (os.environ.get('EMAIL_USER') or '').strip()
