@@ -170,7 +170,12 @@ function attachStatusHandlers() {
                     status: newStatus
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     row.setAttribute('data-status', newStatus);
@@ -181,6 +186,11 @@ function attachStatusHandlers() {
                     
                     // Update statistics without reload
                     updateStatistics();
+                    
+                    // Show success message if email was sent
+                    if (data.message && data.message.includes('email sent')) {
+                        alert('Status updated and ticket email sent!');
+                    }
                 } else {
                     alert('Error updating status: ' + (data.message || 'Unknown error'));
                     this.value = oldValue;

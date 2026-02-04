@@ -320,15 +320,32 @@ class Booking:
     def update_one(cls, filter_dict, update_dict):
         collection = cls.get_collection()
         if collection is not None:
-            return collection.update_one(filter_dict, update_dict)
-        else:
-            # Update in JSON file
+            try:
+                result = collection.update_one(filter_dict, update_dict)
+                return result
+            except Exception as e:
+                print(f"Mongo update_one error: {e}")
+                # Fall through to JSON fallback
+                collection = None
+        
+        # Update in JSON file
+        try:
             bookings = cls._load_from_json()
+            found = False
             for i, booking in enumerate(bookings):
-                if all(booking.get(k) == v for k, v in filter_dict.items()):
-                    bookings[i].update(update_dict['$set'])
-                    _atomic_write_json(cls.JSON_FILE, bookings)
-                    return type('Result', (), {'modified_count': 1})()
+                if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in filter_dict.items()):
+                    bookings[i].update(update_dict.get('$set', {}))
+                    found = True
+                    break
+            
+            if found:
+                _atomic_write_json(cls.JSON_FILE, bookings)
+                return type('Result', (), {'modified_count': 1})()
+            return type('Result', (), {'modified_count': 0})()
+        except Exception as e:
+            print(f"JSON update_one error: {e}")
+            import traceback
+            traceback.print_exc()
             return type('Result', (), {'modified_count': 0})()
 
     @classmethod
