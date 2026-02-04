@@ -35,10 +35,16 @@ In **Environment** tab, add:
 |-----|-------|
 | `SECRET_KEY` | Any random string (e.g. `spectra-holi-2026-secret-key-change-me`) |
 | `MONGO_URI` | `mongodb+srv://nirotyaymukherjee563_db_user:YOUR_PASSWORD@cluster0.zyixrsi.mongodb.net/?appName=Cluster0` |
-| `EMAIL_USER` | Your Gmail (e.g. yourname@gmail.com) |
-| `EMAIL_PASS` | Gmail App Password (not regular password) |
+| `RESEND_API_KEY` | Your Resend API key (e.g. `re_Hf3zZg8z_84by2NfLKGNCkGFqubhShAZM`) |
+| `RESEND_FROM_EMAIL` | `onboarding@resend.dev` (for testing) or your verified domain email |
 | `GOOGLE_SHEET_ID` | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
 | `GOOGLE_CREDS_PATH` | `creds.json` |
+
+> **Resend Setup:** 
+> - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
+> - Get API key from [resend.com/api-keys](https://resend.com/api-keys)
+> - For testing, use `onboarding@resend.dev` as RESEND_FROM_EMAIL
+> - For production, verify your domain at [resend.com/domains](https://resend.com/domains)
 
 ### 5. Google Sheets Credentials (Secret File)
 
@@ -49,8 +55,13 @@ In **Environment** tab, add:
 5. **Contents:** Paste your full Google service account JSON
 6. Set env var: `GOOGLE_CREDS_PATH` = `creds.json` (Render mounts it in the app root)
 
-> **Gmail App Password:** Gmail → Account → Security → 2-Step Verification → App passwords. Create one for "Mail".  
-> **If ticket emails fail:** Ensure EMAIL_USER and EMAIL_PASS are set. Use App Password, not regular password. Check Render logs for "Email auth failed" or "Email send failed".
+> **Resend Email Setup:** 
+> - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
+> - Get API key from [resend.com/api-keys](https://resend.com/api-keys)
+> - Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in Render environment variables
+> - For testing, use `onboarding@resend.dev` as RESEND_FROM_EMAIL
+> - For production, verify your domain at [resend.com/domains](https://resend.com/domains)
+> - **If ticket emails fail:** Check Render logs for Resend errors. Ensure RESEND_API_KEY and RESEND_FROM_EMAIL are set correctly.
 
 ### 6. Deploy
 
@@ -124,7 +135,7 @@ Netlify is for static sites. For this Flask app:
 |----------|----------|-------------|
 | `SECRET_KEY` | Yes | Random secret for sessions |
 | `MONGO_URI` | Yes | MongoDB Atlas connection string |
-| `EMAIL_USER` | Yes | Gmail for ticket emails |
-| `EMAIL_PASS` | Yes | Gmail app password |
+| `RESEND_API_KEY` | Yes | Resend API key from [resend.com/api-keys](https://resend.com/api-keys) |
+| `RESEND_FROM_EMAIL` | Yes | Verified sender email (use `onboarding@resend.dev` for testing) |
 | `GOOGLE_SHEET_ID` | Yes | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
 | `GOOGLE_CREDS_PATH` | Yes | Path to `creds.json` (service account) |

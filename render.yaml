@@ -11,8 +11,9 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: MONGO_URI
-      - key: EMAIL_USER
-      - key: EMAIL_PASS
+      - key: RESEND_API_KEY
+      - key: RESEND_FROM_EMAIL
+        value: onboarding@resend.dev
       - key: GOOGLE_SHEET_ID
         value: 13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew
       - key: GOOGLE_CREDS_PATH
