@@ -3,33 +3,62 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+from email.utils import formataddr
 from config import Config
 
+
 def send_email(to, subject, body, attachment=None):
-    if not Config.EMAIL_USER or not Config.EMAIL_PASS:
-        print(f"Email not configured. Would send to {to}: {subject}")
-        return
-    
-    msg = MIMEMultipart()
-    msg['From'] = Config.EMAIL_USER
+    """Send email with optional PDF attachment. Returns True on success, False otherwise."""
+    email_user = getattr(Config, 'EMAIL_USER', None) or ''
+    email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
+    email_user = email_user.strip() if email_user else ''
+    email_pass = email_pass.strip() if email_pass else ''
+
+    if not email_user or not email_pass:
+        print(f"Email not configured (EMAIL_USER/EMAIL_PASS missing). Would send to {to}: {subject}")
+        return False
+
+    if not to or not str(to).strip():
+        print("No recipient email address provided")
+        return False
+
+    to = str(to).strip()
+    msg = MIMEMultipart('alternative')
+    msg['From'] = formataddr(('Spectra HoliParty', email_user))
     msg['To'] = to
     msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'html'))
-    
+    msg.attach(MIMEText(body, 'html', 'utf-8'))
+
     if attachment:
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload(attachment.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f"attachment; filename=ticket.pdf")
-        msg.attach(part)
-    
+        try:
+            if hasattr(attachment, 'seek'):
+                attachment.seek(0)
+            payload = attachment.read() if hasattr(attachment, 'read') else attachment
+            if payload:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(payload)
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment', filename='Spectra_HoliParty_Ticket.pdf')
+                msg.attach(part)
+        except Exception as e:
+            print(f"Attachment error: {e}")
+
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
+        server.ehlo()
         server.starttls()
-        server.login(Config.EMAIL_USER, Config.EMAIL_PASS)
-        text = msg.as_string()
-        server.sendmail(Config.EMAIL_USER, to, text)
+        server.ehlo()
+        server.login(email_user, email_pass)
+        server.sendmail(email_user, to, msg.as_string())
         server.quit()
         print(f"Email sent to {to}")
+        return True
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"Email auth failed (check EMAIL_USER/EMAIL_PASS, use Gmail App Password): {e}")
+        return False
+    except smtplib.SMTPRecipientsRefused as e:
+        print(f"Email recipient refused: {e}")
+        return False
     except Exception as e:
         print(f"Email send failed: {e}")
+        return False

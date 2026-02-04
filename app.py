@@ -168,7 +168,9 @@ def update_booking_status():
                     <p>Your ticket is attached. Ticket ID: <strong>{booking['ticket_id']}</strong> | Amount: <strong>₹{booking.get('amount', booking['passes'] * 200)}</strong></p>
                     <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
                     """
-                    send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+                    sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+                    if not sent:
+                        print(f"Failed to send ticket email to {booking['email']} for {booking['ticket_id']}")
                     booking_amount = booking.get('amount', booking['passes'] * 200)
                     update_sheet([booking['name'], booking['email'], booking['phone'], booking['ticket_id'], booking['passes'], booking_amount, 'Paid', 'Not Used', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
                 except Exception as e:
@@ -255,7 +257,9 @@ def admin_send_mail():
             <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
             <p>— Spectra HoliParty Team</p>
             """
-            send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+            sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+            if not sent:
+                return jsonify({'success': False, 'message': 'Email send failed. Check EMAIL_USER and EMAIL_PASS (use Gmail App Password).'})
         else:
             body = f"""
             <h2>Dear {booking['name']},</h2>
@@ -265,7 +269,9 @@ def admin_send_mail():
             <p>For any queries, reach us at the numbers on our website.</p>
             <p>— Spectra HoliParty Team</p>
             """
-            send_email(booking['email'], "Spectra HoliParty 2026 - Payment Verification Required", body)
+            sent = send_email(booking['email'], "Spectra HoliParty 2026 - Payment Verification Required", body)
+            if not sent:
+                return jsonify({'success': False, 'message': 'Email send failed. Check email configuration.'})
         return jsonify({'success': True})
     except Exception as e:
         print(f"Admin send mail error: {e}")

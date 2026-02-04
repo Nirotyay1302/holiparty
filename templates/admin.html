@@ -228,7 +228,7 @@ document.querySelectorAll('.mail-btn').forEach(btn => {
         .then(data => {
             this.disabled = false;
             this.textContent = orig;
-            alert(data.success ? 'Mail sent!' : 'Failed to send.');
+            alert(data.success ? 'Mail sent!' : (data.message || 'Failed to send.'));
         })
         .catch(() => { this.disabled = false; this.textContent = orig; });
     });

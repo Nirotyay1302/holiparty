@@ -1,18 +1,28 @@
 """Generate Spectra HoliParty PDF tickets with name, ticket ID, and amount highlighted."""
 import io
+import os
+import tempfile
 from fpdf import FPDF
 from PIL import Image
 
 
 def generate_ticket_pdf(booking):
     """Generate a PDF ticket for the booking. Returns BytesIO buffer."""
-    qr_img = None
+    qr_path = None
     try:
         from utils.qr_utils import generate_qr
-        qr_buf = generate_qr(booking['ticket_id'])
+        qr_buf = generate_qr(booking.get('ticket_id', 'N/A'))
         qr_img = Image.open(qr_buf)
+        fd, qr_path = tempfile.mkstemp(suffix='.png')
+        os.close(fd)
+        qr_img.save(qr_path, format='PNG')
     except Exception:
-        pass
+        if qr_path and os.path.exists(qr_path):
+            try:
+                os.unlink(qr_path)
+            except Exception:
+                pass
+        qr_path = None
 
     pass_type_labels = {
         'entry': 'Entry Only',
@@ -68,16 +78,27 @@ def generate_ticket_pdf(booking):
     pdf.ln(5)
 
     # QR Code
-    if qr_img:
-        y_pos = pdf.get_y()
-        pdf.image(qr_img, x=75, y=y_pos, w=60)
-        pdf.set_y(y_pos + 65)
+    if qr_path:
+        try:
+            y_pos = pdf.get_y()
+            pdf.image(qr_path, x=75, y=y_pos, w=60)
+            pdf.set_y(y_pos + 65)
+        except Exception:
+            pass
+        finally:
+            if qr_path and os.path.exists(qr_path):
+                try:
+                    os.unlink(qr_path)
+                except Exception:
+                    pass
 
     pdf.set_font("Arial", 'I', 8)
     pdf.set_text_color(128, 128, 128)
     pdf.cell(0, 5, txt="Show this ticket at the gate. Organized by Spectra Group - 2nd Year of HoliParty!", ln=1, align='C')
 
-    pdf_buf = io.BytesIO()
-    pdf.output(pdf_buf)
+    out = pdf.output(dest='S')
+    if isinstance(out, str):
+        out = out.encode('latin-1')
+    pdf_buf = io.BytesIO(out)
     pdf_buf.seek(0)
     return pdf_buf

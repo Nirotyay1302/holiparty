@@ -49,7 +49,8 @@ In **Environment** tab, add:
 5. **Contents:** Paste your full Google service account JSON
 6. Set env var: `GOOGLE_CREDS_PATH` = `creds.json` (Render mounts it in the app root)
 
-> **Gmail App Password:** Gmail → Account → Security → 2-Step Verification → App passwords. Create one for "Mail".
+> **Gmail App Password:** Gmail → Account → Security → 2-Step Verification → App passwords. Create one for "Mail".  
+> **If ticket emails fail:** Ensure EMAIL_USER and EMAIL_PASS are set. Use App Password, not regular password. Check Render logs for "Email auth failed" or "Email send failed".
 
 ### 6. Deploy
 

@@ -8,7 +8,7 @@ class Config:
         'host': os.environ.get('MONGO_URI') or 'mongodb+srv://nirotyaymukherjee563_db_user:U9dbgw3jvJTUUJnw@cluster0.zyixrsi.mongodb.net/'
     }
     # Razorpay removed - UPI/QR payment only
-    EMAIL_USER = os.environ.get('EMAIL_USER')
-    EMAIL_PASS = os.environ.get('EMAIL_PASS')
+    EMAIL_USER = (os.environ.get('EMAIL_USER') or '').strip()
+    EMAIL_PASS = (os.environ.get('EMAIL_PASS') or '').strip()
     GOOGLE_SHEET_ID = os.environ.get('GOOGLE_SHEET_ID') or '13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew'
     GOOGLE_CREDS_PATH = os.environ.get('GOOGLE_CREDS_PATH') or 'creds.json'
