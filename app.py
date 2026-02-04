@@ -232,39 +232,40 @@ def admin_content():
 @app.route('/delete_booking', methods=['POST'])
 def delete_booking():
     if 'admin_logged_in' not in session:
-        return jsonify({'success': False})
+        return jsonify({'success': False, 'message': 'Not authenticated'})
     try:
         data = request.get_json()
         ticket_id = data.get('ticket_id')
         if not ticket_id:
-            return jsonify({'success': False})
+            return jsonify({'success': False, 'message': 'No ticket ID provided'})
         
         # Delete from Mongo/JSON
         result = Booking.delete_one({'ticket_id': ticket_id})
         deleted_count = getattr(result, 'deleted_count', 0)
         
         # Also delete from Google Sheet (persistent store)
+        sheet_deleted = False
         try:
-            delete_booking_from_sheet(ticket_id)
+            sheet_deleted = delete_booking_from_sheet(ticket_id)
         except Exception as e:
             print(f"Sheet delete failed (non-fatal): {e}")
         
-        # If deleted from primary store, return success
-        if deleted_count > 0:
-            return jsonify({'success': True})
+        # Return success if deleted from either store
+        if deleted_count > 0 or sheet_deleted:
+            return jsonify({'success': True, 'message': 'Booking deleted successfully'})
         
-        # If not found in primary store, still try to delete from sheet
-        # (handles case where booking only exists in sheet)
-        sheet_deleted = delete_booking_from_sheet(ticket_id)
-        if sheet_deleted:
-            return jsonify({'success': True})
+        # Check if booking exists at all
+        booking_exists = Booking.find_one(ticket_id=ticket_id)
+        if not booking_exists:
+            # Booking doesn't exist, consider it already deleted
+            return jsonify({'success': True, 'message': 'Booking not found (may already be deleted)'})
         
-        return jsonify({'success': False, 'message': 'Booking not found'})
+        return jsonify({'success': False, 'message': 'Failed to delete booking'})
     except Exception as e:
         print(f"Delete booking error: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'success': False, 'message': str(e)})
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
 
 @app.route('/admin_send_mail', methods=['POST'])
 def admin_send_mail():
