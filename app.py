@@ -158,7 +158,7 @@ def update_booking_status():
             # If status changed to Paid and wasn't before, send ticket
             if new_status == 'Paid' and old_status != 'Paid':
                 content = EventContent.get_content()
-                venue = content.get('venue', 'Amrakunja Park')
+                venue = content.get('venue', 'Dighi Garden Mankundu')
                 booking_with_venue = {**booking, 'venue': venue}
                 try:
                     pdf_buf = generate_ticket_pdf(booking_with_venue)
@@ -242,7 +242,7 @@ def admin_send_mail():
         if not booking:
             return jsonify({'success': False})
         content = EventContent.get_content()
-        venue = content.get('venue', 'Amrakunja Park')
+        venue = content.get('venue', 'Dighi Garden Mankundu')
         booking_with_venue = {**booking, 'venue': venue}
         if mail_type == 'success':
             pdf_buf = generate_ticket_pdf(booking_with_venue)

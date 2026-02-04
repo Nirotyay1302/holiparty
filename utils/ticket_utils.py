@@ -21,7 +21,7 @@ def generate_ticket_pdf(booking):
     }
     pass_label = pass_type_labels.get(booking.get('pass_type', 'entry'), 'Entry Only')
     amount = booking.get('amount', booking['passes'] * 200)
-    venue = booking.get('venue', 'Amrakunja Park')
+    venue = booking.get('venue', 'Dighi Garden Mankundu')
 
     pdf = FPDF()
     pdf.add_page()
