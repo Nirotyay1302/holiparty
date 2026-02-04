@@ -11,7 +11,8 @@ class Config:
     }
     # Razorpay removed - UPI/QR payment only
     # Email via Resend API (HTTPS-based, works on Render free tier)
-    RESEND_API_KEY = (os.environ.get('RESEND_API_KEY') or '').strip()
+    # Default API key provided, but should be set via environment variable in production
+    RESEND_API_KEY = (os.environ.get('RESEND_API_KEY') or 're_Hf3zZg8z_84by2NfLKGNCkGFqubhShAZM').strip()
     RESEND_FROM_EMAIL = (os.environ.get('RESEND_FROM_EMAIL') or 'onboarding@resend.dev').strip()
     # Legacy Gmail SMTP (kept for backward compatibility, but not used)
     EMAIL_USER = (os.environ.get('EMAIL_USER') or '').strip()

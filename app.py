@@ -62,7 +62,7 @@ def add_cache_headers(response):
 
 # Lazy imports for heavy modules (speeds up cold start)
 from models import Booking, EventContent
-from utils.email_utils import send_email
+from utils.email_utils import send_email, create_success_email_template
 from utils.qr_utils import generate_qr
 from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete, upsert_booking_row, delete_booking_from_sheet
 from utils.ticket_utils import generate_ticket_pdf
@@ -213,16 +213,19 @@ def update_booking_status():
             
             email_sent = False
             try:
+                # Generate PDF ticket
                 pdf_buf = generate_ticket_pdf(booking_with_venue)
-                body = f"""
-                <h2>Dear {booking['name']},</h2>
-                <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is now confirmed!</p>
-                <p>Your ticket is attached. Ticket ID: <strong>{booking['ticket_id']}</strong> | Amount: <strong>₹{booking.get('amount', booking['passes'] * 200)}</strong></p>
-                <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
-                <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
-                <p>— Spectra HoliParty Team</p>
-                """
-                email_sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+                
+                # Create comprehensive email template with all booking and plan details
+                email_body = create_success_email_template(booking_with_venue, content)
+                
+                # Send email with ticket attachment
+                email_sent = send_email(
+                    booking['email'], 
+                    "🎉 Spectra HoliParty 2026 - Your Entry Pass Confirmed! 🎉", 
+                    email_body, 
+                    pdf_buf
+                )
                 if email_sent:
                     print(f"Ticket email sent successfully to {booking['email']} for {booking['ticket_id']}")
                 else:
@@ -332,13 +335,13 @@ def admin_send_mail():
         if not booking:
             return jsonify({'success': False, 'message': f'Booking with ticket ID {ticket_id} not found'})
         
-        # Check email configuration
-        email_user = getattr(Config, 'EMAIL_USER', None) or ''
-        email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
-        if not email_user or not email_pass:
+        # Check email configuration (Resend)
+        resend_api_key = getattr(Config, 'RESEND_API_KEY', None) or ''
+        resend_from = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
+        if not resend_api_key or not resend_from:
             return jsonify({
                 'success': False, 
-                'message': 'Email not configured. Set EMAIL_USER and EMAIL_PASS in Render Environment Variables.'
+                'message': 'Email not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL in Render Environment Variables.'
             })
         
         content = EventContent.get_content()
@@ -347,23 +350,25 @@ def admin_send_mail():
         
         if mail_type == 'success':
             try:
+                # Generate PDF ticket
                 pdf_buf = generate_ticket_pdf(booking_with_venue)
-                body = f"""
-                <h2>Dear {booking['name']},</h2>
-                <p>Greetings from <strong>Spectra Team</strong>!</p>
-                <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is confirmed.</p>
-                <p>Your ticket is attached with <strong>Ticket ID: {booking['ticket_id']}</strong> and <strong>Amount: ₹{booking.get('amount', booking['passes'] * 200)}</strong>.</p>
-                <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
-                <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
-                <p>— Spectra HoliParty Team</p>
-                """
-                sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+                
+                # Create comprehensive email template with all booking and plan details
+                email_body = create_success_email_template(booking_with_venue, content)
+                
+                # Send email with ticket attachment via Resend
+                sent = send_email(
+                    booking['email'], 
+                    "🎉 Spectra HoliParty 2026 - Your Entry Pass Confirmed! 🎉", 
+                    email_body, 
+                    pdf_buf
+                )
                 if sent:
-                    return jsonify({'success': True, 'message': 'Email sent successfully!'})
+                    return jsonify({'success': True, 'message': 'Email sent successfully via Resend!'})
                 else:
                     return jsonify({
                         'success': False, 
-                        'message': 'Email send failed. Check Render logs for details. Ensure EMAIL_USER and EMAIL_PASS are set correctly (use Gmail App Password).'
+                        'message': 'Email send failed. Check Render logs for details. Ensure RESEND_API_KEY and RESEND_FROM_EMAIL are set correctly.'
                     })
             except Exception as e:
                 print(f"Error generating PDF or sending email: {e}")
