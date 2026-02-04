@@ -13,6 +13,10 @@ class Config:
     # Email via Resend API (HTTPS-based, works on Render free tier)
     # Default API key provided, but should be set via environment variable in production
     RESEND_API_KEY = (os.environ.get('RESEND_API_KEY') or 're_Hf3zZg8z_84by2NfLKGNCkGFqubhShAZM').strip()
+    # RESEND_FROM_EMAIL options:
+    # - For testing: 'onboarding@resend.dev' (works immediately, no setup)
+    # - For production: Use your verified domain email (e.g., 'tickets@yourdomain.com')
+    # NOTE: Resend does NOT support Gmail addresses (@gmail.com). You need a custom domain.
     RESEND_FROM_EMAIL = (os.environ.get('RESEND_FROM_EMAIL') or 'onboarding@resend.dev').strip()
     # Legacy Gmail SMTP (kept for backward compatibility, but not used)
     EMAIL_USER = (os.environ.get('EMAIL_USER') or '').strip()

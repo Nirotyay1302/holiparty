@@ -17,9 +17,8 @@ A complete web application for promoting and managing bookings for Spectra HoliP
 ### Prerequisites
 - Python 3.8+
 - MongoDB Atlas account
-- Razorpay account
+- Resend account (for emails) - [resend.com](https://resend.com)
 - Google Cloud account for Sheets API
-- Gmail account for emails
 
 ### Local Development
 
@@ -41,10 +40,8 @@ A complete web application for promoting and managing bookings for Spectra HoliP
    ```
    SECRET_KEY=your-secret-key
    MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/holi_party
-   RAZORPAY_KEY_ID=your-razorpay-key-id
-   RAZORPAY_KEY_SECRET=your-razorpay-key-secret
-   EMAIL_USER=your-gmail@gmail.com
-   EMAIL_PASS=your-gmail-app-password
+   RESEND_API_KEY=your-resend-api-key
+   RESEND_FROM_EMAIL=onboarding@resend.dev
    GOOGLE_SHEET_ID=your-google-sheet-id
    GOOGLE_CREDS_PATH=path/to/creds.json
    ```
@@ -55,9 +52,11 @@ A complete web application for promoting and managing bookings for Spectra HoliP
    - Download the JSON credentials file and place it in the project root as `creds.json`.
    - Share the Google Sheet with the service account email.
 
-6. For Gmail:
-   - Enable 2-factor authentication.
-   - Generate an app password and use it as EMAIL_PASS.
+6. For Resend Email:
+   - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
+   - Get API key from [resend.com/api-keys](https://resend.com/api-keys)
+   - For testing: Use `onboarding@resend.dev` (works immediately)
+   - For production: Verify your domain (see RESEND_SETUP.md for details)
 
 7. Run the application:
    ```
@@ -86,8 +85,11 @@ A complete web application for promoting and managing bookings for Spectra HoliP
 - Sign up for Razorpay.
 - Get API keys and set in environment.
 
-#### Email (Gmail SMTP)
-- As described in setup.
+#### Email (Resend API)
+- Sign up at [resend.com](https://resend.com)
+- Get API key and set RESEND_API_KEY
+- Set RESEND_FROM_EMAIL (use `onboarding@resend.dev` for testing)
+- See RESEND_SETUP.md for detailed setup guide
 
 #### Excel Update (Google Sheets)
 - As described in setup.
@@ -109,7 +111,7 @@ A complete web application for promoting and managing bookings for Spectra HoliP
 
 ## Troubleshooting
 
-- If emails don't send, check Gmail settings and app password.
+- If emails don't send, check Resend API key and RESEND_FROM_EMAIL settings. See RESEND_SETUP.md for troubleshooting.
 - If payments fail, verify Razorpay keys.
 - If database connection fails, check MongoDB URI.
 - If Google Sheets update fails, check credentials and sheet sharing.

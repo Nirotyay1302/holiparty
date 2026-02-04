@@ -40,11 +40,12 @@ In **Environment** tab, add:
 | `GOOGLE_SHEET_ID` | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
 | `GOOGLE_CREDS_PATH` | `creds.json` |
 
-> **Resend Setup:** 
+> **📧 Resend Email Setup (See RESEND_SETUP.md for detailed guide):** 
+> - **Quick Start (Testing):** Use `onboarding@resend.dev` - works immediately, no setup needed!
+> - **Production:** Get a custom domain and verify it with Resend (see RESEND_SETUP.md)
+> - **Important:** Resend does NOT support Gmail addresses. You need a custom domain for production.
 > - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
 > - Get API key from [resend.com/api-keys](https://resend.com/api-keys)
-> - For testing, use `onboarding@resend.dev` as RESEND_FROM_EMAIL
-> - For production, verify your domain at [resend.com/domains](https://resend.com/domains)
 
 ### 5. Google Sheets Credentials (Secret File)
 
@@ -123,7 +124,7 @@ Netlify is for static sites. For this Flask app:
 - [ ] Test payment confirmation (UPI/QR)
 - [ ] Test admin login and status update
 - [ ] Test contact form
-- [ ] Verify email sending (Gmail app password)
+- [ ] Verify email sending (Resend API - check RESEND_SETUP.md for details)
 - [ ] Verify Google Sheet sync
 - [ ] Add custom domain (if needed)
 
