@@ -1,4 +1,5 @@
 import smtplib
+import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
@@ -46,7 +47,7 @@ def send_email(to, subject, body, attachment=None):
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
         server.ehlo()
-        server.starttls()
+        server.starttls(context=ssl.create_default_context())
         server.ehlo()
         server.login(email_user, email_pass)
         server.sendmail(email_user, to, msg.as_string())

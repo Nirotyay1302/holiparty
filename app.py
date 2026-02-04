@@ -23,7 +23,7 @@ def add_cache_headers(response):
 from models import Booking, EventContent
 from utils.email_utils import send_email
 from utils.qr_utils import generate_qr
-from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete
+from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete, upsert_booking_row
 from utils.ticket_utils import generate_ticket_pdf
 
 # Razorpay client
@@ -105,6 +105,11 @@ def create_order():
     ticket_id = str(uuid.uuid4())[:8].upper()
     booking = Booking(name=name, email=email, phone=phone, address=address, passes=passes, ticket_id=ticket_id, order_id=ticket_id, payment_status='Pending', pass_type=pass_type, amount=amount, is_group_booking=is_group_booking)
     booking.save()
+    # Persistent fallback store (Google Sheet) so admin portal doesn't lose data on restarts
+    try:
+        upsert_booking_row(booking.__dict__)
+    except Exception as e:
+        print(f"Sheet upsert (create_order) failed: {e}")
 
     print(f"Booking saved with ticket_id: {ticket_id}")
 
@@ -127,6 +132,11 @@ def confirm_payment():
     booking = Booking.find_one(ticket_id=ticket_id)
     if booking:
         Booking.update_one({'ticket_id': ticket_id}, {'$set': {'payment_status': 'Awaiting Verification'}})
+        try:
+            booking_updated = {**booking, 'payment_status': 'Awaiting Verification'}
+            upsert_booking_row(booking_updated)
+        except Exception as e:
+            print(f"Sheet upsert (confirm_payment) failed: {e}")
 
     # Do not send ticket yet - wait for admin verification
     return render_template('success.html', awaiting_verification=True)
@@ -155,6 +165,11 @@ def update_booking_status():
         result = Booking.update_one({'ticket_id': ticket_id}, {'$set': {'payment_status': new_status}})
         modified = getattr(result, 'modified_count', 1)
         if True:  # Proceed - update attempted
+            try:
+                booking_for_sheet = {**booking, 'payment_status': new_status}
+                upsert_booking_row(booking_for_sheet)
+            except Exception as e:
+                print(f"Sheet upsert (update_booking_status) failed: {e}")
             # If status changed to Paid and wasn't before, send ticket
             if new_status == 'Paid' and old_status != 'Paid':
                 content = EventContent.get_content()
@@ -172,6 +187,7 @@ def update_booking_status():
                     if not sent:
                         print(f"Failed to send ticket email to {booking['email']} for {booking['ticket_id']}")
                     booking_amount = booking.get('amount', booking['passes'] * 200)
+                    # Keep legacy append behavior, but primary is upsert_booking_row
                     update_sheet([booking['name'], booking['email'], booking['phone'], booking['ticket_id'], booking['passes'], booking_amount, 'Paid', 'Not Used', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
                 except Exception as e:
                     print(f"Admin ticket send error: {e}")

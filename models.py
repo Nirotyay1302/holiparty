@@ -2,10 +2,42 @@ from pymongo import MongoClient
 from config import Config
 import json
 import os
+import tempfile
+from datetime import datetime
 
 # Singleton MongoDB client - reuse connection across requests
 _mongo_client = None
 _mongo_disabled_until = 0  # epoch seconds; backoff when Mongo is failing
+
+def _data_path(filename: str) -> str:
+    base = getattr(Config, "DATA_DIR", "") or ""
+    base = base.strip()
+    if base:
+        try:
+            os.makedirs(base, exist_ok=True)
+        except Exception:
+            pass
+        return os.path.join(base, filename)
+    return filename
+
+def _atomic_write_json(path: str, payload):
+    """Write JSON atomically to avoid partial/corrupt files."""
+    d = os.path.dirname(path) or "."
+    try:
+        os.makedirs(d, exist_ok=True)
+    except Exception:
+        pass
+    fd, tmp_path = tempfile.mkstemp(prefix="tmp_", suffix=".json", dir=d)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2, default=str)
+        os.replace(tmp_path, path)
+    finally:
+        try:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+        except Exception:
+            pass
 
 def _deep_merge_keep_existing(base, updates):
     """
@@ -94,7 +126,7 @@ def _get_client():
 
 class EventContent:
     # Use JSON file as fallback when MongoDB is not available
-    JSON_FILE = 'event_content.json'
+    JSON_FILE = _data_path('event_content.json')
     
     DEFAULT_CONTENT = {
         'event_date': 'March 4, 2026',
@@ -189,22 +221,24 @@ class EventContent:
             existing = cls._load_from_json() if os.path.exists(cls.JSON_FILE) else {}
             existing = _strip_mongo_id(existing or {})
             merged = _deep_merge_keep_existing(existing, _strip_mongo_id(content or {}))
-            with open(cls.JSON_FILE, 'w') as f:
-                json.dump(merged, f, indent=2)
+            _atomic_write_json(cls.JSON_FILE, merged)
             cls.invalidate_cache()
 
     @classmethod
     def _load_from_json(cls):
         if os.path.exists(cls.JSON_FILE):
-            with open(cls.JSON_FILE, 'r') as f:
-                return json.load(f)
+            try:
+                with open(cls.JSON_FILE, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                return cls.DEFAULT_CONTENT
         else:
             cls.save_content(cls.DEFAULT_CONTENT)
             return cls.DEFAULT_CONTENT
 
 class Booking:
     # Use JSON file as fallback when MongoDB is not available
-    JSON_FILE = 'bookings.json'
+    JSON_FILE = _data_path('bookings.json')
 
     @classmethod
     def get_collection(cls):
@@ -237,6 +271,7 @@ class Booking:
         self.pass_type = pass_type
         self.amount = amount if amount is not None else passes * 200
         self.is_group_booking = is_group_booking
+        self.booking_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def save(self):
         collection = self.get_collection()
@@ -249,8 +284,7 @@ class Booking:
     def _save_to_json(self):
         bookings = self._load_from_json()
         bookings.append(self.__dict__)
-        with open(self.JSON_FILE, 'w') as f:
-            json.dump(bookings, f, indent=2, default=str)
+        _atomic_write_json(self.JSON_FILE, bookings)
 
     @classmethod
     def find_one(cls, **kwargs):
@@ -271,8 +305,16 @@ class Booking:
         if collection is not None:
             return list(collection.find())
         else:
-            # Load from JSON file
-            return cls._load_from_json()
+            # Load from JSON file; if empty/missing, fall back to Google Sheet (persistent)
+            data = cls._load_from_json()
+            if data:
+                return data
+            try:
+                from utils.excel_utils import read_bookings_from_google_sheet
+                sheet_data = read_bookings_from_google_sheet()
+                return sheet_data or []
+            except Exception:
+                return data
 
     @classmethod
     def update_one(cls, filter_dict, update_dict):
@@ -285,8 +327,7 @@ class Booking:
             for i, booking in enumerate(bookings):
                 if all(booking.get(k) == v for k, v in filter_dict.items()):
                     bookings[i].update(update_dict['$set'])
-                    with open(cls.JSON_FILE, 'w') as f:
-                        json.dump(bookings, f, indent=2, default=str)
+                    _atomic_write_json(cls.JSON_FILE, bookings)
                     return type('Result', (), {'modified_count': 1})()
             return type('Result', (), {'modified_count': 0})()
 
@@ -300,14 +341,17 @@ class Booking:
             for i, booking in enumerate(bookings):
                 if all(booking.get(k) == v for k, v in filter_dict.items()):
                     bookings.pop(i)
-                    with open(cls.JSON_FILE, 'w') as f:
-                        json.dump(bookings, f, indent=2, default=str)
+                    _atomic_write_json(cls.JSON_FILE, bookings)
                     return type('Result', (), {'deleted_count': 1})()
             return type('Result', (), {'deleted_count': 0})()
 
     @classmethod
     def _load_from_json(cls):
         if os.path.exists(cls.JSON_FILE):
-            with open(cls.JSON_FILE, 'r') as f:
-                return json.load(f)
+            try:
+                with open(cls.JSON_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    return data if isinstance(data, list) else []
+            except Exception:
+                return []
         return []
