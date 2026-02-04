@@ -1,151 +1,107 @@
-import smtplib
-import ssl
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
-from email.utils import formataddr
+import base64
+from io import BytesIO
 from config import Config
+
+try:
+    import resend
+except ImportError:
+    resend = None
 
 
 def send_email(to, subject, body, attachment=None):
-    """Send email with optional PDF attachment. Returns True on success, False otherwise."""
-    email_user = getattr(Config, 'EMAIL_USER', None) or ''
-    email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
-    email_user = email_user.strip() if email_user else ''
-    email_pass = email_pass.strip() if email_pass else ''
+    """Send email with optional PDF attachment using Resend API. Returns True on success, False otherwise."""
+    api_key = getattr(Config, 'RESEND_API_KEY', None) or ''
+    from_email = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
     
-    # Remove spaces from app password (Gmail app passwords sometimes have spaces)
-    email_pass = email_pass.replace(' ', '')
-
-    # Detailed diagnostics
-    if not email_user:
-        print("ERROR: EMAIL_USER is empty or not set in environment variables")
+    api_key = api_key.strip() if api_key else ''
+    from_email = from_email.strip() if from_email else ''
+    
+    # Check if resend package is installed
+    if resend is None:
+        print("ERROR: resend package is not installed. Run: pip install resend")
         return False
     
-    if not email_pass:
-        print("ERROR: EMAIL_PASS is empty or not set in environment variables")
+    # Validate configuration
+    if not api_key:
+        print("ERROR: RESEND_API_KEY is empty or not set in environment variables")
+        print("Get your API key from: https://resend.com/api-keys")
         return False
     
-    if '@gmail.com' not in email_user.lower() and '@googlemail.com' not in email_user.lower():
-        print(f"WARNING: EMAIL_USER ({email_user[:5]}...) doesn't look like a Gmail address")
+    if not from_email:
+        print("ERROR: RESEND_FROM_EMAIL is empty or not set in environment variables")
+        print("Set it to your verified domain email (e.g., tickets@yourdomain.com) or use resend.com domain")
+        return False
     
-    if len(email_pass) < 16:
-        print(f"WARNING: EMAIL_PASS length is {len(email_pass)} (Gmail App Passwords are usually 16 characters)")
-    
-    print(f"Attempting to send email from {email_user[:5]}... to {to}")
-
     if not to or not str(to).strip():
         print("No recipient email address provided")
         return False
-
+    
     to = str(to).strip()
-    msg = MIMEMultipart('alternative')
-    msg['From'] = formataddr(('Spectra HoliParty', email_user))
-    msg['To'] = to
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'html', 'utf-8'))
-
-    if attachment:
-        try:
-            if hasattr(attachment, 'seek'):
-                attachment.seek(0)
-            payload = attachment.read() if hasattr(attachment, 'read') else attachment
-            if payload:
-                part = MIMEBase('application', 'octet-stream')
-                part.set_payload(payload)
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition', 'attachment', filename='Spectra_HoliParty_Ticket.pdf')
-                msg.attach(part)
-        except Exception as e:
-            print(f"Attachment error: {e}")
-
+    
+    print(f"Attempting to send email via Resend from {from_email} to {to}")
+    
     try:
-        # Create SSL context with proper settings
-        context = ssl.create_default_context()
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
+        # Initialize Resend client
+        resend.api_key = api_key
         
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
-        server.set_debuglevel(0)
+        # Prepare attachment if provided
+        attachments = []
+        if attachment:
+            try:
+                if hasattr(attachment, 'seek'):
+                    attachment.seek(0)
+                pdf_data = attachment.read() if hasattr(attachment, 'read') else attachment
+                
+                if pdf_data:
+                    # Convert to base64 for Resend
+                    if isinstance(pdf_data, bytes):
+                        pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')
+                    else:
+                        pdf_base64 = base64.b64encode(bytes(pdf_data)).decode('utf-8')
+                    
+                    attachments.append({
+                        "filename": "Spectra_HoliParty_Ticket.pdf",
+                        "content": pdf_base64  # Resend expects base64-encoded content
+                    })
+            except Exception as e:
+                print(f"Attachment processing error: {e}")
         
-        # EHLO
-        code, message = server.ehlo()
-        if code != 250:
-            print(f"EHLO failed: {code} {message}")
-            server.quit()
+        # Send email via Resend
+        params = {
+            "from": from_email,
+            "to": [to],
+            "subject": subject,
+            "html": body,
+        }
+        
+        if attachments:
+            params["attachments"] = attachments
+        
+        response = resend.Emails.send(params)
+        
+        # Check response
+        if response and hasattr(response, 'id'):
+            print(f"✓ Email sent successfully to {to} (Resend ID: {response.id})")
+            return True
+        else:
+            print(f"Email send failed: Unexpected response from Resend: {response}")
             return False
-        
-        # STARTTLS
-        code, message = server.starttls(context=context)
-        if code != 220:
-            print(f"STARTTLS failed: {code} {message}")
-            server.quit()
-            return False
-        
-        # EHLO again after STARTTLS
-        code, message = server.ehlo()
-        if code != 250:
-            print(f"EHLO after STARTTLS failed: {code} {message}")
-            server.quit()
-            return False
-        
-        # Login
-        try:
-            code, message = server.login(email_user, email_pass)
-            if code != 235:
-                print(f"LOGIN failed: {code} {message}")
-                server.quit()
-                return False
-        except smtplib.SMTPAuthenticationError as auth_err:
-            error_code = getattr(auth_err, 'smtp_code', 'Unknown')
-            error_msg = str(auth_err)
-            print(f"SMTP Authentication Error [{error_code}]: {error_msg}")
-            print(f"EMAIL_USER: {email_user}")
-            print(f"EMAIL_PASS length: {len(email_pass)} characters")
-            print("SOLUTION: Go to Gmail → Account → Security → 2-Step Verification → App passwords")
-            print("Generate a new App Password and set it as EMAIL_PASS in Render")
-            server.quit()
-            return False
-        
-        # Send email
-        try:
-            failed = server.sendmail(email_user, [to], msg.as_string())
-            if failed:
-                print(f"Some recipients failed: {failed}")
-                server.quit()
-                return False
-        except smtplib.SMTPRecipientsRefused as e:
-            print(f"Recipients refused: {e}")
-            server.quit()
-            return False
-        
-        server.quit()
-        print(f"✓ Email sent successfully to {to}")
-        return True
-        
-    except smtplib.SMTPAuthenticationError as e:
-        error_code = getattr(e, 'smtp_code', 'Unknown')
-        error_msg = str(e)
-        print(f"SMTP Authentication Error [{error_code}]: {error_msg}")
-        print(f"EMAIL_USER: {email_user}")
-        print(f"EMAIL_PASS: {'*' * len(email_pass)} (length: {len(email_pass)})")
-        print("SOLUTION:")
-        print("1. Go to https://myaccount.google.com/apppasswords")
-        print("2. Generate App Password for 'Mail'")
-        print("3. Copy the 16-character password")
-        print("4. Set EMAIL_PASS in Render Environment Variables")
-        return False
-    except smtplib.SMTPRecipientsRefused as e:
-        print(f"Email recipient refused: {e}")
-        return False
-    except smtplib.SMTPException as e:
-        print(f"SMTP error: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
+            
     except Exception as e:
-        print(f"Email send failed: {e}")
+        error_msg = str(e)
+        print(f"Email send failed: {error_msg}")
+        
+        # Provide helpful error messages
+        if "Unauthorized" in error_msg or "401" in error_msg:
+            print("SOLUTION: Check your RESEND_API_KEY in Render environment variables")
+            print("Get your API key from: https://resend.com/api-keys")
+        elif "Forbidden" in error_msg or "403" in error_msg:
+            print("SOLUTION: Verify your sender domain or use a Resend test domain")
+            print("Check: https://resend.com/domains")
+        elif "validation" in error_msg.lower() or "invalid" in error_msg.lower():
+            print("SOLUTION: Check that RESEND_FROM_EMAIL is a valid verified email address")
+            print("For testing, you can use: onboarding@resend.dev")
+        
         import traceback
         traceback.print_exc()
         return False

@@ -10,6 +10,10 @@ class Config:
         'host': (os.environ.get('MONGO_URI') or '').strip()
     }
     # Razorpay removed - UPI/QR payment only
+    # Email via Resend API (HTTPS-based, works on Render free tier)
+    RESEND_API_KEY = (os.environ.get('RESEND_API_KEY') or '').strip()
+    RESEND_FROM_EMAIL = (os.environ.get('RESEND_FROM_EMAIL') or 'onboarding@resend.dev').strip()
+    # Legacy Gmail SMTP (kept for backward compatibility, but not used)
     EMAIL_USER = (os.environ.get('EMAIL_USER') or '').strip()
     EMAIL_PASS = (os.environ.get('EMAIL_PASS') or '').strip()
     GOOGLE_SHEET_ID = os.environ.get('GOOGLE_SHEET_ID') or '13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew'

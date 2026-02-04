@@ -18,34 +18,38 @@ def test_email_config():
     if 'admin_logged_in' not in session:
         return jsonify({'error': 'Not authenticated'})
     
-    email_user = getattr(Config, 'EMAIL_USER', None) or ''
-    email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
+    resend_api_key = getattr(Config, 'RESEND_API_KEY', None) or ''
+    resend_from = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
     
     config_status = {
-        'EMAIL_USER_set': bool(email_user),
-        'EMAIL_USER_value': email_user[:5] + '...' if email_user else 'NOT SET',
-        'EMAIL_PASS_set': bool(email_pass),
-        'EMAIL_PASS_length': len(email_pass) if email_pass else 0,
-        'is_gmail': '@gmail.com' in email_user.lower() if email_user else False,
+        'RESEND_API_KEY_set': bool(resend_api_key),
+        'RESEND_API_KEY_value': resend_api_key[:8] + '...' if resend_api_key else 'NOT SET',
+        'RESEND_FROM_EMAIL_set': bool(resend_from),
+        'RESEND_FROM_EMAIL_value': resend_from if resend_from else 'NOT SET',
     }
     
-    # Try to send a test email
+    # Try to send a test email via Resend
     test_result = None
-    if email_user and email_pass:
+    if resend_api_key and resend_from:
         try:
             test_body = "<p>This is a test email from Spectra HoliParty admin panel.</p>"
-            test_result = send_email(email_user, "Test Email - Spectra HoliParty", test_body)
+            test_result = send_email(resend_from, "Test Email - Spectra HoliParty", test_body)
         except Exception as e:
             test_result = f"Error: {str(e)}"
+    elif not resend_api_key:
+        test_result = "RESEND_API_KEY not configured"
+    elif not resend_from:
+        test_result = "RESEND_FROM_EMAIL not configured"
     
     return jsonify({
         'config': config_status,
         'test_email_sent': test_result,
         'instructions': {
-            'step1': 'Go to https://myaccount.google.com/apppasswords',
-            'step2': 'Generate App Password for "Mail"',
-            'step3': 'Copy the 16-character password',
-            'step4': 'Set EMAIL_USER and EMAIL_PASS in Render Environment Variables',
+            'step1': 'Sign up at https://resend.com (free tier: 3,000 emails/month)',
+            'step2': 'Go to https://resend.com/api-keys and create an API key',
+            'step3': 'Copy the API key and set RESEND_API_KEY in Render Environment Variables',
+            'step4': 'Set RESEND_FROM_EMAIL to your verified domain email (or use onboarding@resend.dev for testing)',
+            'step5': 'Verify your domain at https://resend.com/domains (optional, for production)',
         }
     })
 
