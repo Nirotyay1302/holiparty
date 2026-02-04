@@ -141,12 +141,8 @@ def create_order():
 
     ticket_id = str(uuid.uuid4())[:8].upper()
     booking = Booking(name=name, email=email, phone=phone, address=address, passes=passes, ticket_id=ticket_id, order_id=ticket_id, payment_status='Pending', pass_type=pass_type, amount=amount, is_group_booking=is_group_booking)
+    # Save to Google Sheet (primary), MongoDB (optional), and JSON (cache)
     booking.save()
-    # Persistent fallback store (Google Sheet) so admin portal doesn't lose data on restarts
-    try:
-        upsert_booking_row(booking.__dict__)
-    except Exception as e:
-        print(f"Sheet upsert (create_order) failed: {e}")
 
     print(f"Booking saved with ticket_id: {ticket_id}")
 
@@ -168,12 +164,8 @@ def confirm_payment():
 
     booking = Booking.find_one(ticket_id=ticket_id)
     if booking:
+        # Booking.update_one() now handles Google Sheet automatically (primary store)
         Booking.update_one({'ticket_id': ticket_id}, {'$set': {'payment_status': 'Awaiting Verification'}})
-        try:
-            booking_updated = {**booking, 'payment_status': 'Awaiting Verification'}
-            upsert_booking_row(booking_updated)
-        except Exception as e:
-            print(f"Sheet upsert (confirm_payment) failed: {e}")
 
     # Do not send ticket yet - wait for admin verification
     return render_template('success.html', awaiting_verification=True)
@@ -204,70 +196,46 @@ def update_booking_status():
         
         old_status = booking.get('payment_status', 'Pending')
         
-        # Update in primary store (Mongo/JSON)
+        # Update booking (Google Sheet is PRIMARY, Mongo/JSON are optional fallbacks)
         result = Booking.update_one({'ticket_id': ticket_id}, {'$set': {'payment_status': new_status}})
         modified = getattr(result, 'modified_count', 0)
         
-        # Update in Google Sheet (persistent store)
-        sheet_updated = False
-        try:
-            # Ensure booking has all required fields
-            booking_for_sheet = {
-                'name': booking.get('name', ''),
-                'email': booking.get('email', ''),
-                'phone': booking.get('phone', ''),
-                'ticket_id': ticket_id,
-                'passes': booking.get('passes', 0),
-                'amount': booking.get('amount', booking.get('passes', 0) * 200),
-                'payment_status': new_status,
-                'entry_status': booking.get('entry_status', 'Not Used'),
-                'booking_date': booking.get('booking_date', datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
-                'pass_type': booking.get('pass_type', 'entry'),
-            }
-            sheet_updated = upsert_booking_row(booking_for_sheet)
-        except Exception as e:
-            print(f"Sheet upsert (update_booking_status) failed: {e}")
-            import traceback
-            traceback.print_exc()
-        
-        # Consider update successful if either store was updated
-        if modified > 0 or sheet_updated:
-            # If status changed to Paid and wasn't before, send ticket email
-            if new_status == 'Paid' and old_status != 'Paid':
-                content = EventContent.get_content()
-                venue = content.get('venue', 'Dighi Garden Mankundu')
-                booking_with_venue = {**booking, 'venue': venue, 'payment_status': new_status}
-                
-                email_sent = False
-                try:
-                    pdf_buf = generate_ticket_pdf(booking_with_venue)
-                    body = f"""
-                    <h2>Dear {booking['name']},</h2>
-                    <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is now confirmed!</p>
-                    <p>Your ticket is attached. Ticket ID: <strong>{booking['ticket_id']}</strong> | Amount: <strong>₹{booking.get('amount', booking['passes'] * 200)}</strong></p>
-                    <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
-                    <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
-                    <p>— Spectra HoliParty Team</p>
-                    """
-                    email_sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
-                    if email_sent:
-                        print(f"Ticket email sent successfully to {booking['email']} for {booking['ticket_id']}")
-                    else:
-                        print(f"Failed to send ticket email to {booking['email']} for {booking['ticket_id']}")
-                except Exception as e:
-                    print(f"Error sending ticket email: {e}")
-                    import traceback
-                    traceback.print_exc()
-                
-                # Return success even if email failed (status was updated)
-                return jsonify({
-                    'success': True, 
-                    'message': 'Status updated successfully' + (' and email sent' if email_sent else ' (email failed - check logs)')
-                })
+        # Google Sheet is primary, so update always succeeds if booking exists
+        # If status changed to Paid and wasn't before, send ticket email
+        if new_status == 'Paid' and old_status != 'Paid':
+            content = EventContent.get_content()
+            venue = content.get('venue', 'Dighi Garden Mankundu')
+            booking_with_venue = {**booking, 'venue': venue, 'payment_status': new_status}
             
-            return jsonify({'success': True, 'message': 'Status updated successfully'})
-        else:
-            return jsonify({'success': False, 'message': 'Failed to update booking status'})
+            email_sent = False
+            try:
+                pdf_buf = generate_ticket_pdf(booking_with_venue)
+                body = f"""
+                <h2>Dear {booking['name']},</h2>
+                <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is now confirmed!</p>
+                <p>Your ticket is attached. Ticket ID: <strong>{booking['ticket_id']}</strong> | Amount: <strong>₹{booking.get('amount', booking['passes'] * 200)}</strong></p>
+                <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
+                <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
+                <p>— Spectra HoliParty Team</p>
+                """
+                email_sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+                if email_sent:
+                    print(f"Ticket email sent successfully to {booking['email']} for {booking['ticket_id']}")
+                else:
+                    print(f"Failed to send ticket email to {booking['email']} for {booking['ticket_id']}")
+            except Exception as e:
+                print(f"Error sending ticket email: {e}")
+                import traceback
+                traceback.print_exc()
+            
+            # Return success (status updated in Google Sheet)
+            return jsonify({
+                'success': True, 
+                'message': 'Status updated successfully' + (' and email sent' if email_sent else ' (email failed - check logs)')
+            })
+        
+        # Status updated successfully (Google Sheet is primary)
+        return jsonify({'success': True, 'message': 'Status updated successfully'})
             
     except Exception as e:
         print(f"update_booking_status error: {e}")

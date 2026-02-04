@@ -274,12 +274,30 @@ class Booking:
         self.booking_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def save(self):
+        # PRIMARY: Save to Google Sheet (persistent, reliable, free)
+        try:
+            from utils.excel_utils import upsert_booking_row
+            sheet_saved = upsert_booking_row(self.__dict__)
+            if sheet_saved:
+                print(f"Booking {self.ticket_id} saved to Google Sheet")
+        except Exception as e:
+            print(f"Google Sheet save failed: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        # SECONDARY: Try MongoDB (optional, can fail)
         collection = self.get_collection()
         if collection is not None:
-            collection.insert_one(self.__dict__)
-        else:
-            # Save to JSON file
+            try:
+                collection.insert_one(self.__dict__)
+            except Exception as e:
+                print(f"MongoDB save failed (non-fatal): {e}")
+        
+        # TERTIARY: Save to JSON file (local cache, ephemeral on Render)
+        try:
             self._save_to_json()
+        except Exception as e:
+            print(f"JSON save failed (non-fatal): {e}")
 
     def _save_to_json(self):
         bookings = self._load_from_json()
@@ -288,19 +306,7 @@ class Booking:
 
     @classmethod
     def find_one(cls, **kwargs):
-        collection = cls.get_collection()
-        if collection is not None:
-            result = collection.find_one(kwargs)
-            if result:
-                return result
-        
-        # Check JSON file
-        bookings = cls._load_from_json()
-        for booking in bookings:
-            if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in kwargs.items()):
-                return booking
-        
-        # If not found in Mongo/JSON, check Google Sheet (persistent fallback)
+        # PRIMARY: Search Google Sheet first (persistent, reliable)
         try:
             from utils.excel_utils import read_bookings_from_google_sheet
             sheet_bookings = read_bookings_from_google_sheet()
@@ -308,40 +314,82 @@ class Booking:
                 if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in kwargs.items()):
                     return booking
         except Exception as e:
-            print(f"Sheet read in find_one failed: {e}")
+            print(f"Google Sheet read in find_one failed: {e}")
+        
+        # SECONDARY: Try MongoDB (optional)
+        collection = cls.get_collection()
+        if collection is not None:
+            try:
+                result = collection.find_one(kwargs)
+                if result:
+                    return result
+            except Exception as e:
+                print(f"MongoDB find_one failed (non-fatal): {e}")
+        
+        # TERTIARY: Check JSON file (local cache)
+        bookings = cls._load_from_json()
+        for booking in bookings:
+            if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in kwargs.items()):
+                return booking
         
         return None
 
     @classmethod
     def find_all(cls):
+        # PRIMARY: Load from Google Sheet (persistent, reliable)
+        try:
+            from utils.excel_utils import read_bookings_from_google_sheet
+            sheet_data = read_bookings_from_google_sheet()
+            if sheet_data:
+                return sheet_data
+        except Exception as e:
+            print(f"Google Sheet read failed: {e}")
+        
+        # SECONDARY: Try MongoDB (optional)
         collection = cls.get_collection()
         if collection is not None:
-            return list(collection.find())
-        else:
-            # Load from JSON file; if empty/missing, fall back to Google Sheet (persistent)
-            data = cls._load_from_json()
-            if data:
-                return data
             try:
-                from utils.excel_utils import read_bookings_from_google_sheet
-                sheet_data = read_bookings_from_google_sheet()
-                return sheet_data or []
-            except Exception:
-                return data
+                mongo_data = list(collection.find())
+                if mongo_data:
+                    return mongo_data
+            except Exception as e:
+                print(f"MongoDB read failed (non-fatal): {e}")
+        
+        # TERTIARY: Load from JSON file (local cache)
+        return cls._load_from_json()
 
     @classmethod
     def update_one(cls, filter_dict, update_dict):
+        # PRIMARY: Update Google Sheet (persistent, reliable)
+        try:
+            from utils.excel_utils import read_bookings_from_google_sheet, upsert_booking_row
+            sheet_bookings = read_bookings_from_google_sheet()
+            found_in_sheet = False
+            for booking in sheet_bookings:
+                if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in filter_dict.items()):
+                    # Update booking dict
+                    updated_booking = {**booking}
+                    updated_booking.update(update_dict.get('$set', {}))
+                    # Save back to sheet
+                    if upsert_booking_row(updated_booking):
+                        found_in_sheet = True
+                        break
+            if found_in_sheet:
+                return type('Result', (), {'modified_count': 1})()
+        except Exception as e:
+            print(f"Google Sheet update_one failed: {e}")
+        
+        # SECONDARY: Try MongoDB (optional)
         collection = cls.get_collection()
         if collection is not None:
             try:
                 result = collection.update_one(filter_dict, update_dict)
-                return result
+                if result and getattr(result, 'modified_count', 0) > 0:
+                    return result
             except Exception as e:
-                print(f"Mongo update_one error: {e}")
-                # Fall through to JSON fallback
-                collection = None
+                print(f"MongoDB update_one failed (non-fatal): {e}")
         
-        # Update in JSON file
+        # TERTIARY: Update JSON file (local cache)
         try:
             bookings = cls._load_from_json()
             found = False
@@ -354,26 +402,45 @@ class Booking:
             if found:
                 _atomic_write_json(cls.JSON_FILE, bookings)
                 return type('Result', (), {'modified_count': 1})()
-            return type('Result', (), {'modified_count': 0})()
         except Exception as e:
             print(f"JSON update_one error: {e}")
-            import traceback
-            traceback.print_exc()
-            return type('Result', (), {'modified_count': 0})()
+        
+        return type('Result', (), {'modified_count': 0})()
 
     @classmethod
     def delete_one(cls, filter_dict):
+        # PRIMARY: Delete from Google Sheet (persistent, reliable)
+        try:
+            from utils.excel_utils import delete_booking_from_sheet
+            ticket_id = filter_dict.get('ticket_id')
+            if ticket_id:
+                if delete_booking_from_sheet(ticket_id):
+                    return type('Result', (), {'deleted_count': 1})()
+        except Exception as e:
+            print(f"Google Sheet delete_one failed: {e}")
+        
+        # SECONDARY: Try MongoDB (optional)
         collection = cls.get_collection()
         if collection is not None:
-            return collection.delete_one(filter_dict)
-        else:
+            try:
+                result = collection.delete_one(filter_dict)
+                if result and getattr(result, 'deleted_count', 0) > 0:
+                    return result
+            except Exception as e:
+                print(f"MongoDB delete_one failed (non-fatal): {e}")
+        
+        # TERTIARY: Delete from JSON file (local cache)
+        try:
             bookings = cls._load_from_json()
             for i, booking in enumerate(bookings):
-                if all(booking.get(k) == v for k, v in filter_dict.items()):
+                if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in filter_dict.items()):
                     bookings.pop(i)
                     _atomic_write_json(cls.JSON_FILE, bookings)
                     return type('Result', (), {'deleted_count': 1})()
-            return type('Result', (), {'deleted_count': 0})()
+        except Exception as e:
+            print(f"JSON delete_one error: {e}")
+        
+        return type('Result', (), {'deleted_count': 0})()
 
     @classmethod
     def _load_from_json(cls):
