@@ -37,13 +37,16 @@ def upsert_booking_row(booking_dict):
         headers = ['Name', 'Email', 'Phone', 'Ticket ID', 'Passes', 'Amount', 'Payment Status', 'Entry Status', 'Booking Date', 'Pass Type']
         # Ensure header exists
         existing_headers = worksheet.row_values(1)
-        if [h.strip() for h in existing_headers] != headers:
-            # If sheet is empty, write headers; otherwise preserve and just ensure headers are present
-            if not existing_headers:
+        existing_headers_stripped = [h.strip() for h in existing_headers] if existing_headers else []
+        
+        # Add "Pass Type" header if missing (column J)
+        if len(existing_headers_stripped) < 10 or existing_headers_stripped[9] != 'Pass Type':
+            if len(existing_headers_stripped) == 9:
+                # Sheet has 9 headers, add "Pass Type" as 10th
+                worksheet.update_cell(1, 10, 'Pass Type')
+            elif not existing_headers:
+                # Empty sheet, write all headers
                 worksheet.append_row(headers)
-            else:
-                # If headers are different, keep existing sheet and do not rewrite to avoid deleting data
-                pass
 
         ticket_id = (booking_dict.get('ticket_id') or '').strip()
         if not ticket_id:
@@ -63,13 +66,18 @@ def upsert_booking_row(booking_dict):
         ]
 
         try:
-            # Find ticket id cell
-            cell = worksheet.find(ticket_id)
+            # Find ticket id cell (search in column D which is Ticket ID)
+            all_values = worksheet.col_values(4)  # Column D = Ticket ID
+            row_num = None
+            for idx, val in enumerate(all_values, start=1):
+                if idx > 1 and str(val).strip().upper() == ticket_id.upper():
+                    row_num = idx
+                    break
         except Exception:
-            cell = None
+            row_num = None
 
-        if cell and cell.row > 1:
-            worksheet.update(f"A{cell.row}:J{cell.row}", [row])
+        if row_num and row_num > 1:
+            worksheet.update(f"A{row_num}:J{row_num}", [row])
         else:
             worksheet.append_row(row)
         return True
@@ -83,25 +91,49 @@ def read_bookings_from_google_sheet():
     if worksheet is None:
         return []
     try:
-        records = worksheet.get_all_records()
+        # Get all data rows (skip header row 1)
+        all_values = worksheet.get_all_values()
+        if len(all_values) < 2:
+            return []
+        
+        headers = [h.strip() for h in all_values[0]]
+        # Ensure we have at least 9 columns, add Pass Type if missing
+        if len(headers) < 10:
+            headers.extend([''] * (10 - len(headers)))
+        if headers[9] != 'Pass Type':
+            headers[9] = 'Pass Type'
+        
         out = []
-        for r in records:
+        for row_data in all_values[1:]:
+            if not row_data or not row_data[0]:  # Skip empty rows
+                continue
+            # Pad row to match headers
+            row_data_padded = row_data + [''] * (len(headers) - len(row_data))
+            
+            # Build dict from headers
+            r = {}
+            for idx, header in enumerate(headers):
+                if header:
+                    r[header] = row_data_padded[idx] if idx < len(row_data_padded) else ''
+            
             # Normalize keys expected by admin template
             out.append({
-                'name': r.get('Name', ''),
-                'email': r.get('Email', ''),
-                'phone': r.get('Phone', ''),
-                'ticket_id': r.get('Ticket ID', ''),
+                'name': r.get('Name', '').strip(),
+                'email': r.get('Email', '').strip(),
+                'phone': r.get('Phone', '').strip(),
+                'ticket_id': r.get('Ticket ID', '').strip(),
                 'passes': int(r.get('Passes', 0) or 0),
                 'amount': int(r.get('Amount', 0) or 0),
-                'payment_status': r.get('Payment Status', ''),
-                'entry_status': r.get('Entry Status', 'Not Used') or 'Not Used',
-                'booking_date': r.get('Booking Date', ''),
-                'pass_type': r.get('Pass Type', 'entry') or 'entry',
+                'payment_status': r.get('Payment Status', '').strip() or 'Pending',
+                'entry_status': r.get('Entry Status', 'Not Used').strip() or 'Not Used',
+                'booking_date': r.get('Booking Date', '').strip(),
+                'pass_type': r.get('Pass Type', 'entry').strip() or 'entry',
             })
         return out
     except Exception as e:
         print(f"Sheet read failed: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 def sync_sheet_after_delete(bookings):
