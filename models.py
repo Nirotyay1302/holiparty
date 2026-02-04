@@ -290,14 +290,27 @@ class Booking:
     def find_one(cls, **kwargs):
         collection = cls.get_collection()
         if collection is not None:
-            return collection.find_one(kwargs)
-        else:
-            # Load from JSON file
-            bookings = cls._load_from_json()
-            for booking in bookings:
-                if all(booking.get(k) == v for k, v in kwargs.items()):
+            result = collection.find_one(kwargs)
+            if result:
+                return result
+        
+        # Check JSON file
+        bookings = cls._load_from_json()
+        for booking in bookings:
+            if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in kwargs.items()):
+                return booking
+        
+        # If not found in Mongo/JSON, check Google Sheet (persistent fallback)
+        try:
+            from utils.excel_utils import read_bookings_from_google_sheet
+            sheet_bookings = read_bookings_from_google_sheet()
+            for booking in sheet_bookings:
+                if all(str(booking.get(k, '')).strip().upper() == str(v).strip().upper() for k, v in kwargs.items()):
                     return booking
-            return None
+        except Exception as e:
+            print(f"Sheet read in find_one failed: {e}")
+        
+        return None
 
     @classmethod
     def find_all(cls):
