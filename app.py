@@ -12,6 +12,43 @@ app.config.from_object(Config)
 def ping():
     return 'ok', 200
 
+@app.route('/test_email_config')
+def test_email_config():
+    """Test endpoint to check email configuration (admin only)."""
+    if 'admin_logged_in' not in session:
+        return jsonify({'error': 'Not authenticated'})
+    
+    email_user = getattr(Config, 'EMAIL_USER', None) or ''
+    email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
+    
+    config_status = {
+        'EMAIL_USER_set': bool(email_user),
+        'EMAIL_USER_value': email_user[:5] + '...' if email_user else 'NOT SET',
+        'EMAIL_PASS_set': bool(email_pass),
+        'EMAIL_PASS_length': len(email_pass) if email_pass else 0,
+        'is_gmail': '@gmail.com' in email_user.lower() if email_user else False,
+    }
+    
+    # Try to send a test email
+    test_result = None
+    if email_user and email_pass:
+        try:
+            test_body = "<p>This is a test email from Spectra HoliParty admin panel.</p>"
+            test_result = send_email(email_user, "Test Email - Spectra HoliParty", test_body)
+        except Exception as e:
+            test_result = f"Error: {str(e)}"
+    
+    return jsonify({
+        'config': config_status,
+        'test_email_sent': test_result,
+        'instructions': {
+            'step1': 'Go to https://myaccount.google.com/apppasswords',
+            'step2': 'Generate App Password for "Mail"',
+            'step3': 'Copy the 16-character password',
+            'step4': 'Set EMAIL_USER and EMAIL_PASS in Render Environment Variables',
+        }
+    })
+
 @app.after_request
 def add_cache_headers(response):
     if request.path.startswith('/static/'):
@@ -311,33 +348,56 @@ def delete_booking():
 @app.route('/admin_send_mail', methods=['POST'])
 def admin_send_mail():
     if 'admin_logged_in' not in session:
-        return jsonify({'success': False})
+        return jsonify({'success': False, 'message': 'Not authenticated'})
     try:
         data = request.get_json()
         ticket_id = data.get('ticket_id')
         mail_type = data.get('mail_type')  # 'success' or 'failure'
         if not ticket_id or mail_type not in ('success', 'failure'):
-            return jsonify({'success': False})
+            return jsonify({'success': False, 'message': 'Invalid request data'})
+        
         booking = Booking.find_one(ticket_id=ticket_id)
         if not booking:
-            return jsonify({'success': False})
+            return jsonify({'success': False, 'message': f'Booking with ticket ID {ticket_id} not found'})
+        
+        # Check email configuration
+        email_user = getattr(Config, 'EMAIL_USER', None) or ''
+        email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
+        if not email_user or not email_pass:
+            return jsonify({
+                'success': False, 
+                'message': 'Email not configured. Set EMAIL_USER and EMAIL_PASS in Render Environment Variables.'
+            })
+        
         content = EventContent.get_content()
         venue = content.get('venue', 'Dighi Garden Mankundu')
         booking_with_venue = {**booking, 'venue': venue}
+        
         if mail_type == 'success':
-            pdf_buf = generate_ticket_pdf(booking_with_venue)
-            body = f"""
-            <h2>Dear {booking['name']},</h2>
-            <p>Greetings from <strong>Spectra Team</strong>!</p>
-            <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is confirmed.</p>
-            <p>Your ticket is attached with <strong>Ticket ID: {booking['ticket_id']}</strong> and <strong>Amount: ₹{booking.get('amount', booking['passes'] * 200)}</strong>.</p>
-            <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
-            <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
-            <p>— Spectra HoliParty Team</p>
-            """
-            sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
-            if not sent:
-                return jsonify({'success': False, 'message': 'Email send failed. Check EMAIL_USER and EMAIL_PASS (use Gmail App Password).'})
+            try:
+                pdf_buf = generate_ticket_pdf(booking_with_venue)
+                body = f"""
+                <h2>Dear {booking['name']},</h2>
+                <p>Greetings from <strong>Spectra Team</strong>!</p>
+                <p>Your <strong>Spectra HoliParty 2026</strong> entry pass is confirmed.</p>
+                <p>Your ticket is attached with <strong>Ticket ID: {booking['ticket_id']}</strong> and <strong>Amount: ₹{booking.get('amount', booking['passes'] * 200)}</strong>.</p>
+                <p>Event: March 4, 2026 | 10:00 AM - 5:00 PM | {venue}</p>
+                <p>Show the QR code at the gate for entry. We look forward to celebrating with you!</p>
+                <p>— Spectra HoliParty Team</p>
+                """
+                sent = send_email(booking['email'], "🎉 Spectra HoliParty 2026 - Your Entry Pass 🎉", body, pdf_buf)
+                if sent:
+                    return jsonify({'success': True, 'message': 'Email sent successfully!'})
+                else:
+                    return jsonify({
+                        'success': False, 
+                        'message': 'Email send failed. Check Render logs for details. Ensure EMAIL_USER and EMAIL_PASS are set correctly (use Gmail App Password).'
+                    })
+            except Exception as e:
+                print(f"Error generating PDF or sending email: {e}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({'success': False, 'message': f'Error: {str(e)}'})
         else:
             body = f"""
             <h2>Dear {booking['name']},</h2>
@@ -348,12 +408,18 @@ def admin_send_mail():
             <p>— Spectra HoliParty Team</p>
             """
             sent = send_email(booking['email'], "Spectra HoliParty 2026 - Payment Verification Required", body)
-            if not sent:
-                return jsonify({'success': False, 'message': 'Email send failed. Check email configuration.'})
-        return jsonify({'success': True})
+            if sent:
+                return jsonify({'success': True, 'message': 'Email sent successfully!'})
+            else:
+                return jsonify({
+                    'success': False, 
+                    'message': 'Email send failed. Check Render logs for details.'
+                })
     except Exception as e:
         print(f"Admin send mail error: {e}")
-        return jsonify({'success': False})
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
 
 @app.route('/export_bookings')
 def export_bookings():

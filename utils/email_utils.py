@@ -18,9 +18,22 @@ def send_email(to, subject, body, attachment=None):
     # Remove spaces from app password (Gmail app passwords sometimes have spaces)
     email_pass = email_pass.replace(' ', '')
 
-    if not email_user or not email_pass:
-        print(f"Email not configured (EMAIL_USER/EMAIL_PASS missing). Would send to {to}: {subject}")
+    # Detailed diagnostics
+    if not email_user:
+        print("ERROR: EMAIL_USER is empty or not set in environment variables")
         return False
+    
+    if not email_pass:
+        print("ERROR: EMAIL_PASS is empty or not set in environment variables")
+        return False
+    
+    if '@gmail.com' not in email_user.lower() and '@googlemail.com' not in email_user.lower():
+        print(f"WARNING: EMAIL_USER ({email_user[:5]}...) doesn't look like a Gmail address")
+    
+    if len(email_pass) < 16:
+        print(f"WARNING: EMAIL_PASS length is {len(email_pass)} (Gmail App Passwords are usually 16 characters)")
+    
+    print(f"Attempting to send email from {email_user[:5]}... to {to}")
 
     if not to or not str(to).strip():
         print("No recipient email address provided")
@@ -48,27 +61,88 @@ def send_email(to, subject, body, attachment=None):
             print(f"Attachment error: {e}")
 
     try:
+        # Create SSL context with proper settings
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        
         server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
-        server.set_debuglevel(0)  # Set to 1 for verbose debug
-        server.ehlo()
-        server.starttls(context=ssl.create_default_context())
-        server.ehlo()
-        server.login(email_user, email_pass)
-        server.sendmail(email_user, [to], msg.as_string())
+        server.set_debuglevel(0)
+        
+        # EHLO
+        code, message = server.ehlo()
+        if code != 250:
+            print(f"EHLO failed: {code} {message}")
+            server.quit()
+            return False
+        
+        # STARTTLS
+        code, message = server.starttls(context=context)
+        if code != 220:
+            print(f"STARTTLS failed: {code} {message}")
+            server.quit()
+            return False
+        
+        # EHLO again after STARTTLS
+        code, message = server.ehlo()
+        if code != 250:
+            print(f"EHLO after STARTTLS failed: {code} {message}")
+            server.quit()
+            return False
+        
+        # Login
+        try:
+            code, message = server.login(email_user, email_pass)
+            if code != 235:
+                print(f"LOGIN failed: {code} {message}")
+                server.quit()
+                return False
+        except smtplib.SMTPAuthenticationError as auth_err:
+            error_code = getattr(auth_err, 'smtp_code', 'Unknown')
+            error_msg = str(auth_err)
+            print(f"SMTP Authentication Error [{error_code}]: {error_msg}")
+            print(f"EMAIL_USER: {email_user}")
+            print(f"EMAIL_PASS length: {len(email_pass)} characters")
+            print("SOLUTION: Go to Gmail → Account → Security → 2-Step Verification → App passwords")
+            print("Generate a new App Password and set it as EMAIL_PASS in Render")
+            server.quit()
+            return False
+        
+        # Send email
+        try:
+            failed = server.sendmail(email_user, [to], msg.as_string())
+            if failed:
+                print(f"Some recipients failed: {failed}")
+                server.quit()
+                return False
+        except smtplib.SMTPRecipientsRefused as e:
+            print(f"Recipients refused: {e}")
+            server.quit()
+            return False
+        
         server.quit()
-        print(f"Email sent successfully to {to}")
+        print(f"✓ Email sent successfully to {to}")
         return True
+        
     except smtplib.SMTPAuthenticationError as e:
+        error_code = getattr(e, 'smtp_code', 'Unknown')
         error_msg = str(e)
-        print(f"Email auth failed: {error_msg}")
-        print(f"Check: EMAIL_USER={email_user[:3]}... EMAIL_PASS length={len(email_pass)}")
-        print("Ensure you're using Gmail App Password (not regular password)")
+        print(f"SMTP Authentication Error [{error_code}]: {error_msg}")
+        print(f"EMAIL_USER: {email_user}")
+        print(f"EMAIL_PASS: {'*' * len(email_pass)} (length: {len(email_pass)})")
+        print("SOLUTION:")
+        print("1. Go to https://myaccount.google.com/apppasswords")
+        print("2. Generate App Password for 'Mail'")
+        print("3. Copy the 16-character password")
+        print("4. Set EMAIL_PASS in Render Environment Variables")
         return False
     except smtplib.SMTPRecipientsRefused as e:
         print(f"Email recipient refused: {e}")
         return False
     except smtplib.SMTPException as e:
         print(f"SMTP error: {e}")
+        import traceback
+        traceback.print_exc()
         return False
     except Exception as e:
         print(f"Email send failed: {e}")
