@@ -9,3 +9,5 @@ gspread
 oauth2client
 pandas
 resend
+requests
+sendgrid

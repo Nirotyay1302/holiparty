@@ -1,11 +1,29 @@
 import base64
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 from io import BytesIO
 from config import Config
 
 try:
     import resend
+    from resend.exceptions import ResendError
 except ImportError:
     resend = None
+    ResendError = Exception
+
+try:
+    import sendgrid
+    from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+except ImportError:
+    sendgrid = None
+
+try:
+    import requests
+except ImportError:
+    requests = None
 
 
 def create_success_email_template(booking, event_content):
@@ -311,65 +329,199 @@ def create_success_email_template(booking, event_content):
     return html_body
 
 
-def send_email(to, subject, body, attachment=None):
-    """Send email with optional PDF attachment using Resend API. Returns True on success, False otherwise."""
+def _send_via_smtp(to, subject, body, attachment=None, from_email=None):
+    """Send email via SMTP (Gmail, etc.)"""
+    email_user = getattr(Config, 'EMAIL_USER', None) or ''
+    email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
+    smtp_host = getattr(Config, 'SMTP_HOST', None) or 'smtp.gmail.com'
+    smtp_port = int(getattr(Config, 'SMTP_PORT', None) or 587)
+    
+    if not from_email:
+        from_email = email_user
+    
+    if not email_user or not email_pass:
+        print("ERROR: EMAIL_USER and EMAIL_PASS must be set for SMTP")
+        return False
+    
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'html'))
+        
+        if attachment:
+            try:
+                if hasattr(attachment, 'seek'):
+                    attachment.seek(0)
+                pdf_data = attachment.read() if hasattr(attachment, 'read') else attachment
+                if pdf_data:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(pdf_data)
+                    encoders.encode_base64(part)
+                    part.add_header('Content-Disposition', 'attachment; filename= "Spectra_HoliParty_Ticket.pdf"')
+                    msg.attach(part)
+            except Exception as e:
+                print(f"Attachment processing error: {e}")
+        
+        server = smtplib.SMTP(smtp_host, smtp_port)
+        server.starttls()
+        server.login(email_user, email_pass)
+        text = msg.as_string()
+        server.sendmail(from_email, to, text)
+        server.quit()
+        
+        print(f"✓ Email sent successfully via SMTP to {to}")
+        return True
+    except Exception as e:
+        print(f"SMTP email send failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def _send_via_sendgrid(to, subject, body, attachment=None, from_email=None):
+    """Send email via SendGrid API"""
+    if sendgrid is None:
+        print("ERROR: sendgrid package not installed. Run: pip install sendgrid")
+        return False
+    
+    api_key = getattr(Config, 'SENDGRID_API_KEY', None) or ''
+    if not from_email:
+        from_email = getattr(Config, 'EMAIL_FROM', None) or getattr(Config, 'EMAIL_USER', None) or ''
+    
+    if not api_key:
+        print("ERROR: SENDGRID_API_KEY must be set")
+        return False
+    
+    try:
+        sg = sendgrid.SendGridAPIClient(api_key=api_key)
+        message = Mail(
+            from_email=from_email,
+            to_emails=to,
+            subject=subject,
+            html_content=body
+        )
+        
+        if attachment:
+            try:
+                if hasattr(attachment, 'seek'):
+                    attachment.seek(0)
+                pdf_data = attachment.read() if hasattr(attachment, 'read') else attachment
+                if pdf_data:
+                    encoded = base64.b64encode(pdf_data).decode()
+                    message.attachment = Attachment(
+                        FileContent(encoded),
+                        FileName('Spectra_HoliParty_Ticket.pdf'),
+                        FileType('application/pdf'),
+                        Disposition('attachment')
+                    )
+            except Exception as e:
+                print(f"Attachment processing error: {e}")
+        
+        response = sg.send(message)
+        print(f"✓ Email sent successfully via SendGrid to {to} (Status: {response.status_code})")
+        return True
+    except Exception as e:
+        print(f"SendGrid email send failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def _send_via_mailgun(to, subject, body, attachment=None, from_email=None):
+    """Send email via Mailgun API"""
+    if requests is None:
+        print("ERROR: requests package not installed. Run: pip install requests")
+        return False
+    
+    api_key = getattr(Config, 'MAILGUN_API_KEY', None) or ''
+    domain = getattr(Config, 'MAILGUN_DOMAIN', None) or ''
+    if not from_email:
+        from_email = getattr(Config, 'EMAIL_FROM', None) or f'tickets@{domain}' if domain else ''
+    
+    if not api_key or not domain:
+        print("ERROR: MAILGUN_API_KEY and MAILGUN_DOMAIN must be set")
+        return False
+    
+    try:
+        url = f"https://api.mailgun.net/v3/{domain}/messages"
+        files = []
+        
+        if attachment:
+            try:
+                if hasattr(attachment, 'seek'):
+                    attachment.seek(0)
+                pdf_data = attachment.read() if hasattr(attachment, 'read') else attachment
+                if pdf_data:
+                    files.append(('attachment', ('Spectra_HoliParty_Ticket.pdf', pdf_data, 'application/pdf')))
+            except Exception as e:
+                print(f"Attachment processing error: {e}")
+        
+        data = {
+            'from': from_email,
+            'to': to,
+            'subject': subject,
+            'html': body
+        }
+        
+        response = requests.post(url, auth=('api', api_key), data=data, files=files)
+        
+        if response.status_code == 200:
+            print(f"✓ Email sent successfully via Mailgun to {to}")
+            return True
+        else:
+            print(f"Mailgun email send failed: {response.status_code} - {response.text}")
+            return False
+    except Exception as e:
+        print(f"Mailgun email send failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def _send_via_resend(to, subject, body, attachment=None, from_email=None):
+    """Send email via Resend API"""
+    if resend is None:
+        print("ERROR: resend package not installed. Run: pip install resend")
+        return False
+    
     api_key = getattr(Config, 'RESEND_API_KEY', None) or ''
-    from_email = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
+    if not from_email:
+        from_email = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
     
     api_key = api_key.strip() if api_key else ''
     from_email = from_email.strip() if from_email else ''
     
-    # Check if resend package is installed
-    if resend is None:
-        print("ERROR: resend package is not installed. Run: pip install resend")
-        return False
-    
-    # Validate configuration
     if not api_key:
-        print("ERROR: RESEND_API_KEY is empty or not set in environment variables")
-        print("Get your API key from: https://resend.com/api-keys")
+        print("ERROR: RESEND_API_KEY is empty or not set")
         return False
     
     if not from_email:
-        print("ERROR: RESEND_FROM_EMAIL is empty or not set in environment variables")
-        print("Set it to your verified domain email (e.g., tickets@yourdomain.com) or use resend.com domain")
+        print("ERROR: RESEND_FROM_EMAIL is empty or not set")
         return False
-    
-    if not to or not str(to).strip():
-        print("No recipient email address provided")
-        return False
-    
-    to = str(to).strip()
-    
-    print(f"Attempting to send email via Resend from {from_email} to {to}")
     
     try:
-        # Initialize Resend client
         resend.api_key = api_key
         
-        # Prepare attachment if provided
         attachments = []
         if attachment:
             try:
                 if hasattr(attachment, 'seek'):
                     attachment.seek(0)
                 pdf_data = attachment.read() if hasattr(attachment, 'read') else attachment
-                
                 if pdf_data:
-                    # Convert to base64 for Resend
                     if isinstance(pdf_data, bytes):
                         pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')
                     else:
                         pdf_base64 = base64.b64encode(bytes(pdf_data)).decode('utf-8')
-                    
                     attachments.append({
                         "filename": "Spectra_HoliParty_Ticket.pdf",
-                        "content": pdf_base64  # Resend expects base64-encoded content
+                        "content": pdf_base64
                     })
             except Exception as e:
                 print(f"Attachment processing error: {e}")
         
-        # Send email via Resend
         params = {
             "from": from_email,
             "to": [to],
@@ -382,29 +534,70 @@ def send_email(to, subject, body, attachment=None):
         
         response = resend.Emails.send(params)
         
-        # Check response
         if response and hasattr(response, 'id'):
-            print(f"✓ Email sent successfully to {to} (Resend ID: {response.id})")
+            print(f"✓ Email sent successfully via Resend to {to} (Resend ID: {response.id})")
             return True
         else:
             print(f"Email send failed: Unexpected response from Resend: {response}")
             return False
-            
-    except Exception as e:
+
+    except ResendError as e:
         error_msg = str(e)
         print(f"Email send failed: {error_msg}")
-        
-        # Provide helpful error messages
-        if "Unauthorized" in error_msg or "401" in error_msg:
-            print("SOLUTION: Check your RESEND_API_KEY in Render environment variables")
-            print("Get your API key from: https://resend.com/api-keys")
-        elif "Forbidden" in error_msg or "403" in error_msg:
-            print("SOLUTION: Verify your sender domain or use a Resend test domain")
-            print("Check: https://resend.com/domains")
-        elif "validation" in error_msg.lower() or "invalid" in error_msg.lower():
-            print("SOLUTION: Check that RESEND_FROM_EMAIL is a valid verified email address")
-            print("For testing, you can use: onboarding@resend.dev")
-        
+        if "only send testing emails to your own email" in error_msg.lower() or "verify a domain" in error_msg.lower():
+            print("SOLUTION: With onboarding@resend.dev you can only send TO the email linked to your Resend account.")
+            print("To send to customers, verify a domain at https://resend.com/domains and set RESEND_FROM_EMAIL to an email on that domain.")
+        return False
+            
+    except Exception as e:
+        print(f"Resend email send failed: {e}")
         import traceback
         traceback.print_exc()
         return False
+
+
+def send_email(to, subject, body, attachment=None):
+    """
+    Send email with optional PDF attachment using configured provider.
+    Supports: smtp, sendgrid, mailgun, resend
+    Set EMAIL_PROVIDER environment variable to choose provider.
+    Returns True on success, False otherwise.
+    """
+    if not to or not str(to).strip():
+        print("No recipient email address provided")
+        return False
+    
+    to = str(to).strip()
+    
+    # Determine which provider to use (default: resend for backward compatibility)
+    provider = (getattr(Config, 'EMAIL_PROVIDER', None) or 'resend').lower().strip()
+    
+    # Get from_email based on provider
+    from_email = None
+    if provider == 'smtp':
+        from_email = getattr(Config, 'EMAIL_USER', None) or ''
+    elif provider == 'sendgrid':
+        from_email = getattr(Config, 'EMAIL_FROM', None) or getattr(Config, 'EMAIL_USER', None) or ''
+    elif provider == 'mailgun':
+        domain = getattr(Config, 'MAILGUN_DOMAIN', None) or ''
+        from_email = getattr(Config, 'EMAIL_FROM', None) or (f'tickets@{domain}' if domain else '')
+    elif provider == 'resend':
+        from_email = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
+    else:
+        from_email = getattr(Config, 'RESEND_FROM_EMAIL', None) or getattr(Config, 'EMAIL_USER', None) or ''
+    
+    print(f"Attempting to send email via {provider.upper()} from {from_email} to {to}")
+    
+    # Route to appropriate provider
+    if provider == 'smtp':
+        return _send_via_smtp(to, subject, body, attachment, from_email)
+    elif provider == 'sendgrid':
+        return _send_via_sendgrid(to, subject, body, attachment, from_email)
+    elif provider == 'mailgun':
+        return _send_via_mailgun(to, subject, body, attachment, from_email)
+    elif provider == 'resend':
+        return _send_via_resend(to, subject, body, attachment, from_email)
+    else:
+        # Default to Resend for backward compatibility
+        print(f"Unknown provider '{provider}', defaulting to Resend")
+        return _send_via_resend(to, subject, body, attachment, from_email)

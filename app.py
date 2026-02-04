@@ -335,14 +335,39 @@ def admin_send_mail():
         if not booking:
             return jsonify({'success': False, 'message': f'Booking with ticket ID {ticket_id} not found'})
         
-        # Check email configuration (Resend)
-        resend_api_key = getattr(Config, 'RESEND_API_KEY', None) or ''
-        resend_from = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
-        if not resend_api_key or not resend_from:
-            return jsonify({
-                'success': False, 
-                'message': 'Email not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL in Render Environment Variables.'
-            })
+        # Check email configuration based on provider
+        email_provider = getattr(Config, 'EMAIL_PROVIDER', None) or 'resend'
+        if email_provider == 'smtp':
+            email_user = getattr(Config, 'EMAIL_USER', None) or ''
+            email_pass = getattr(Config, 'EMAIL_PASS', None) or ''
+            if not email_user or not email_pass:
+                return jsonify({
+                    'success': False, 
+                    'message': 'Email not configured. Set EMAIL_USER and EMAIL_PASS for SMTP, or change EMAIL_PROVIDER.'
+                })
+        elif email_provider == 'sendgrid':
+            api_key = getattr(Config, 'SENDGRID_API_KEY', None) or ''
+            if not api_key:
+                return jsonify({
+                    'success': False, 
+                    'message': 'Email not configured. Set SENDGRID_API_KEY, or change EMAIL_PROVIDER.'
+                })
+        elif email_provider == 'mailgun':
+            api_key = getattr(Config, 'MAILGUN_API_KEY', None) or ''
+            domain = getattr(Config, 'MAILGUN_DOMAIN', None) or ''
+            if not api_key or not domain:
+                return jsonify({
+                    'success': False, 
+                    'message': 'Email not configured. Set MAILGUN_API_KEY and MAILGUN_DOMAIN, or change EMAIL_PROVIDER.'
+                })
+        else:  # resend (default)
+            resend_api_key = getattr(Config, 'RESEND_API_KEY', None) or ''
+            resend_from = getattr(Config, 'RESEND_FROM_EMAIL', None) or ''
+            if not resend_api_key or not resend_from:
+                return jsonify({
+                    'success': False, 
+                    'message': 'Email not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL, or set EMAIL_PROVIDER=smtp to use Gmail.'
+                })
         
         content = EventContent.get_content()
         venue = content.get('venue', 'Dighi Garden Mankundu')
@@ -364,12 +389,23 @@ def admin_send_mail():
                     pdf_buf
                 )
                 if sent:
-                    return jsonify({'success': True, 'message': 'Email sent successfully via Resend!'})
+                    provider = getattr(Config, 'EMAIL_PROVIDER', None) or 'resend'
+                    return jsonify({'success': True, 'message': f'Email sent successfully via {provider.upper()}!'})
                 else:
-                    return jsonify({
-                        'success': False, 
-                        'message': 'Email send failed. Check Render logs for details. Ensure RESEND_API_KEY and RESEND_FROM_EMAIL are set correctly.'
-                    })
+                    provider = getattr(Config, 'EMAIL_PROVIDER', None) or 'resend'
+                    if provider == 'resend':
+                        return jsonify({
+                            'success': False, 
+                            'message': (
+                                'Email not sent. With onboarding@resend.dev you can only send to your Resend account email. '
+                                'To send to customers, verify a domain at resend.com/domains OR set EMAIL_PROVIDER=smtp to use Gmail.'
+                            )
+                        })
+                    else:
+                        return jsonify({
+                            'success': False, 
+                            'message': f'Email send failed. Check Render logs for details. Provider: {provider.upper()}'
+                        })
             except Exception as e:
                 print(f"Error generating PDF or sending email: {e}")
                 import traceback
