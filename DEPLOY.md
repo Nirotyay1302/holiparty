@@ -47,14 +47,19 @@ In **Environment** tab, add:
 > - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
 > - Get API key from [resend.com/api-keys](https://resend.com/api-keys)
 
-### 5. Google Sheets Credentials (Secret File)
+### 5. Google Sheets Credentials
 
-1. In your Web Service → **Environment** tab
-2. Scroll to **Secret Files**
-3. Click **Add Secret File**
-4. **Filename:** `creds.json`
-5. **Contents:** Paste your full Google service account JSON
-6. Set env var: `GOOGLE_CREDS_PATH` = `creds.json` (Render mounts it in the app root)
+**Option A – Secret File (recommended)**  
+1. In your Web Service → **Environment** tab → **Secret Files**  
+2. Click **Add Secret File**  
+3. **Filename:** `creds.json`  
+4. **Contents:** Paste your full Google service account JSON  
+5. Set env var: `GOOGLE_CREDS_PATH` = `creds.json`  
+
+**Option B – Environment variable (if Secret File fails)**  
+1. Set `GOOGLE_CREDS_JSON` = your full service account JSON as a string  
+
+**Important:** Share your Google Sheet with the service account email (e.g. `xxx@xxx.iam.gserviceaccount.com`) from your credentials. Admin bookings and sheet sync will not work without this.
 
 > **Resend Email Setup:** 
 > - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
@@ -139,5 +144,8 @@ Netlify is for static sites. For this Flask app:
 | `RESEND_API_KEY` | Yes | Resend API key from [resend.com/api-keys](https://resend.com/api-keys) |
 | `RESEND_FROM_EMAIL` | Yes | Verified sender email (use `onboarding@resend.dev` for testing) |
 | `GOOGLE_SHEET_ID` | Yes | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
-| `GOOGLE_CREDS_PATH` | Yes | Path to `creds.json` (service account) |
+| `GOOGLE_CREDS_PATH` | Yes* | Path to `creds.json` (e.g. `creds.json`) |
+| `GOOGLE_CREDS_JSON` | Yes* | Alternative: full service account JSON as string (use if Secret File path fails on Render) |
 | `CONTACT_EMAIL` | No | Inbox for contact form (default: spectraholi2026@gmail.com) |
+
+> **Google Sheet setup:** Share your Google Sheet with the **service account email** from your credentials (e.g. `xxx@xxx.iam.gserviceaccount.com`). Admin bookings and sheet updates will fail without this.

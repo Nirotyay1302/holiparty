@@ -1,19 +1,77 @@
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+import json
+import os
 from config import Config
 
+_sheet_client = None
+_sheet_client_error = None
+
+def _get_credentials():
+    """Load Google credentials from GOOGLE_CREDS_JSON env var or from file."""
+    # 1. Try GOOGLE_CREDS_JSON env var (for Render/Heroku where file path can be tricky)
+    creds_json = os.environ.get('GOOGLE_CREDS_JSON', '').strip()
+    if creds_json:
+        try:
+            return json.loads(creds_json)
+        except json.JSONDecodeError as e:
+            print(f"GOOGLE_CREDS_JSON invalid JSON: {e}")
+    
+    # 2. Try file paths (multiple fallbacks for different deployment environments)
+    paths_to_try = [
+        getattr(Config, 'GOOGLE_CREDS_PATH', None) or 'creds.json',
+        'creds.json',
+        './creds.json',
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), 'creds.json'),
+    ]
+    for path in paths_to_try:
+        if not path:
+            continue
+        if os.path.isfile(path):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Failed to read creds from {path}: {e}")
+                continue
+    return None
+
 def _get_worksheet():
-    if not Config.GOOGLE_CREDS_PATH or not Config.GOOGLE_SHEET_ID:
+    """Get the first worksheet of the configured Google Sheet. Returns None on failure."""
+    global _sheet_client, _sheet_client_error
+    
+    sheet_id = (getattr(Config, 'GOOGLE_SHEET_ID', None) or '').strip()
+    if not sheet_id:
+        print("GOOGLE_SHEET_ID not configured")
         return None
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(Config.GOOGLE_CREDS_PATH, scope)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_key(Config.GOOGLE_SHEET_ID)
-    return sheet.get_worksheet(0)
+    
+    try:
+        creds_dict = _get_credentials()
+        if not creds_dict:
+            print("Google credentials not found. Set GOOGLE_CREDS_JSON env var or add creds.json. Ensure GOOGLE_SHEET_ID is set.")
+            return None
+        
+        if _sheet_client is None:
+            if hasattr(gspread, 'service_account_from_dict'):
+                _sheet_client = gspread.service_account_from_dict(creds_dict)
+            else:
+                from oauth2client.service_account import ServiceAccountCredentials
+                scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+                creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+                _sheet_client = gspread.authorize(creds)
+            _sheet_client_error = None
+        
+        sheet = _sheet_client.open_by_key(sheet_id)
+        return sheet.get_worksheet(0)
+    except Exception as e:
+        print(f"Google Sheet connection failed: {e}")
+        import traceback
+        traceback.print_exc()
+        _sheet_client_error = str(e)
+        return None
 
 def update_sheet(data):
-    if not Config.GOOGLE_CREDS_PATH or not Config.GOOGLE_SHEET_ID:
-        print(f"Google Sheets not configured. Would update: {data}")
+    if not getattr(Config, 'GOOGLE_SHEET_ID', None):
+        print(f"Google Sheets not configured (GOOGLE_SHEET_ID missing). Would update: {data}")
         return
     
     try:
@@ -96,38 +154,25 @@ def read_bookings_from_google_sheet():
         if len(all_values) < 2:
             return []
         
-        headers = [h.strip() for h in all_values[0]]
-        # Ensure we have at least 9 columns, add Pass Type if missing
-        if len(headers) < 10:
-            headers.extend([''] * (10 - len(headers)))
-        if headers[9] != 'Pass Type':
-            headers[9] = 'Pass Type'
+        # Column order: Name(0), Email(1), Phone(2), Ticket ID(3), Passes(4), Amount(5), Payment Status(6), Entry Status(7), Booking Date(8), Pass Type(9)
         
         out = []
         for row_data in all_values[1:]:
-            if not row_data or not row_data[0]:  # Skip empty rows
+            if not row_data or (len(row_data) > 0 and not str(row_data[0]).strip()):  # Skip empty rows
                 continue
-            # Pad row to match headers
-            row_data_padded = row_data + [''] * (len(headers) - len(row_data))
+            row_data_padded = row_data + [''] * (10 - len(row_data))
             
-            # Build dict from headers
-            r = {}
-            for idx, header in enumerate(headers):
-                if header:
-                    r[header] = row_data_padded[idx] if idx < len(row_data_padded) else ''
-            
-            # Normalize keys expected by admin template
             out.append({
-                'name': r.get('Name', '').strip(),
-                'email': r.get('Email', '').strip(),
-                'phone': r.get('Phone', '').strip(),
-                'ticket_id': r.get('Ticket ID', '').strip(),
-                'passes': int(r.get('Passes', 0) or 0),
-                'amount': int(r.get('Amount', 0) or 0),
-                'payment_status': r.get('Payment Status', '').strip() or 'Pending',
-                'entry_status': r.get('Entry Status', 'Not Used').strip() or 'Not Used',
-                'booking_date': r.get('Booking Date', '').strip(),
-                'pass_type': r.get('Pass Type', 'entry').strip() or 'entry',
+                'name': (row_data_padded[0] or '').strip(),
+                'email': (row_data_padded[1] or '').strip(),
+                'phone': (row_data_padded[2] or '').strip(),
+                'ticket_id': (row_data_padded[3] or '').strip(),
+                'passes': int(row_data_padded[4] or 0) if row_data_padded[4] else 0,
+                'amount': int(row_data_padded[5] or 0) if row_data_padded[5] else 0,
+                'payment_status': (row_data_padded[6] or 'Pending').strip() or 'Pending',
+                'entry_status': (row_data_padded[7] or 'Not Used').strip() or 'Not Used',
+                'booking_date': (row_data_padded[8] or '').strip(),
+                'pass_type': ((row_data_padded[9] if len(row_data_padded) > 9 else '') or 'entry').strip() or 'entry',
             })
         return out
     except Exception as e:
@@ -179,8 +224,8 @@ def sync_sheet_after_delete(bookings):
     return export_to_google_sheets(data)
 
 def export_to_google_sheets(bookings_data):
-    if not Config.GOOGLE_CREDS_PATH or not Config.GOOGLE_SHEET_ID:
-        print("Google Sheets not configured.")
+    if not getattr(Config, 'GOOGLE_SHEET_ID', None):
+        print("Google Sheets not configured (GOOGLE_SHEET_ID missing).")
         return False
     
     try:
@@ -191,8 +236,8 @@ def export_to_google_sheets(bookings_data):
         # Clear existing data
         worksheet.clear()
         
-        # Add headers
-        headers = ['Name', 'Email', 'Phone', 'Ticket ID', 'Passes', 'Amount', 'Payment Status', 'Entry Status', 'Booking Date']
+        # Add headers (must match upsert_booking_row / read_bookings)
+        headers = ['Name', 'Email', 'Phone', 'Ticket ID', 'Passes', 'Amount', 'Payment Status', 'Entry Status', 'Booking Date', 'Pass Type']
         worksheet.append_row(headers)
         
         # Add data

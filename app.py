@@ -446,19 +446,29 @@ def export_bookings():
 
     data = []
     for booking in bookings:
+        bdate = booking.get('booking_date', '')
+        if not bdate and booking.get('_id') and hasattr(booking['_id'], 'generation_time'):
+            try:
+                bdate = booking['_id'].generation_time.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                bdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        if not bdate:
+            bdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         data.append({
-            'Name': booking['name'],
-            'Email': booking['email'],
-            'Phone': booking['phone'],
-            'Ticket ID': booking['ticket_id'],
-            'Passes': booking['passes'],
-            'Amount': booking.get('amount', booking['passes'] * 200),
-            'Payment Status': booking['payment_status'],
+            'Name': booking.get('name', ''),
+            'Email': booking.get('email', ''),
+            'Phone': booking.get('phone', ''),
+            'Ticket ID': booking.get('ticket_id', ''),
+            'Passes': booking.get('passes', 0),
+            'Amount': booking.get('amount', booking.get('passes', 0) * 200),
+            'Payment Status': booking.get('payment_status', 'Pending'),
             'Entry Status': booking.get('entry_status', 'Not Used'),
-            'Booking Date': (booking.get('_id').generation_time.replace(tzinfo=None) if booking.get('_id') else datetime.now())
+            'Booking Date': bdate,
+            'Pass Type': booking.get('pass_type', 'entry'),
         })
 
-    export_to_google_sheets([[row['Name'], row['Email'], row['Phone'], row['Ticket ID'], row['Passes'], row['Amount'], row['Payment Status'], row['Entry Status'], str(row['Booking Date'])] for row in data])
+    rows = [[r['Name'], r['Email'], r['Phone'], r['Ticket ID'], r['Passes'], r['Amount'], r['Payment Status'], r['Entry Status'], str(r['Booking Date']), r['Pass Type']] for r in data]
+    export_to_google_sheets(rows)
 
     df = pd.DataFrame(data)
     output = io.BytesIO()
