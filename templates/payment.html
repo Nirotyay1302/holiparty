@@ -1,17 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
+<div class="row justify-content-center mx-0">
+    <div class="col-12 col-lg-10">
             <div class="card shadow mb-4">
                 <div class="card-header bg-primary text-white text-center">
                     <h3>💳 Pay via UPI – ₹{{ amount }}</h3>
                     <p class="mb-0 small">Ticket & email will be sent only after admin confirms your payment</p>
                 </div>
+                <div class="alert alert-danger border-0 rounded-0 mb-0 py-3 px-4" style="background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%); border-left: 4px solid #dc3545 !important;">
+                    <strong class="fs-5">⚠️ Important:</strong> You <strong>must</strong> add your Ticket ID <code class="bg-white px-2 py-1 rounded">{{ ticket_id }}</code> in the payment note when sending money. Without it, we cannot match your payment and it will be difficult to process your ticket. No Ticket ID = delayed or no ticket!
+                </div>
                 <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
+                    <div class="row mb-4 g-3">
+                        <div class="col-12 col-md-6">
                             <h5>Order Summary</h5>
                             <div class="card bg-light">
                                 <div class="card-body">
@@ -22,7 +24,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <!-- UPI / QR Code Payment -->
                             <div class="card border-success h-100">
                                 <div class="card-body text-center">
@@ -34,7 +36,7 @@
                                         <input type="text" class="form-control" value="7278737263@jio" readonly>
                                         <button class="btn btn-outline-primary" type="button" onclick="navigator.clipboard.writeText('7278737263@jio'); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy', 2000)">Copy</button>
                                     </div>
-                                    <p class="small text-muted mt-2 mb-2">Pay exactly ₹{{ amount }}. Add Ticket ID <strong>{{ ticket_id }}</strong> in payment note.</p>
+                                    <p class="small fw-bold text-danger mt-2 mb-2">Pay exactly ₹{{ amount }}. <span class="text-decoration-underline">MUST add Ticket ID <strong>{{ ticket_id }}</strong> in payment note</span> – otherwise we cannot process your ticket.</p>
                                     <form action="/confirm_payment" method="POST">
                                         <input type="hidden" name="ticket_id" value="{{ ticket_id }}">
                                         <button type="submit" class="btn btn-warning w-100" id="upiConfirmBtn">
@@ -58,9 +60,9 @@
                                     <strong class="text-primary">SPECTRA HOLIPARTY 2026</strong><br>
                                     <small>Entry Ticket</small>
                                 </div>
-                                <div class="row small">
-                                    <div class="col-6"><strong>Name:</strong> Sample User</div>
-                                    <div class="col-6"><strong>Ticket ID:</strong> XXXXXXXX</div>
+                                <div class="row small g-1">
+                                    <div class="col-6 col-sm-6"><strong>Name:</strong> Sample User</div>
+                                    <div class="col-6 col-sm-6"><strong>Ticket ID:</strong> XXXXXXXX</div>
                                     <div class="col-12 mt-2"><strong class="bg-warning px-2 py-1 rounded">Amount Paid: ₹200</strong></div>
                                     <div class="col-6 mt-2"><strong>Passes:</strong> 1 | Entry Only</div>
                                     <div class="col-6 mt-2"><strong>Venue:</strong> Dighi Garden Mankundu</div>
@@ -74,12 +76,13 @@
                         </div>
                     </div>
 
-                    <div class="card shadow mt-4">
+                    <div class="card shadow mt-4 border-danger">
                         <div class="card-body">
-                            <h6>Payment Instructions</h6>
+                            <h6 class="text-danger">Payment Instructions</h6>
                             <ol class="mb-0">
                                 <li>Scan the QR code or use UPI ID <strong>7278737263@jio</strong></li>
-                                <li>Send exactly <strong>₹{{ amount }}</strong> and add <strong>Ticket ID: {{ ticket_id }}</strong> in the payment note</li>
+                                <li><strong class="text-danger">MUST add Ticket ID <code>{{ ticket_id }}</code> in the payment note</strong> – without it we cannot match your payment and your ticket will be delayed or not processed.</li>
+                                <li>Send exactly <strong>₹{{ amount }}</strong></li>
                                 <li>Click "I've paid via UPI / QR" after payment</li>
                                 <li>Admin will verify and email your ticket. No ticket until admin confirms as Paid.</li>
                             </ol>

@@ -39,11 +39,9 @@
             </div>
         </div>
         <p class="text-white mb-3 small"><strong>Countdown to last registration date (28th Feb)</strong></p>
-        <div class="mb-4">
-            <span class="badge bg-warning text-dark fs-5 px-3 py-2 rounded-pill">Event: {{ content.event_date }} at {{ content.event_time }} | Venue: {{ content.venue }}</span>
-        </div>
-        <div class="mb-4">
-            <span class="badge bg-warning text-dark fs-5 px-3 py-2 rounded-pill">Our 2nd Year of HoliParty! | Entry from ₹{{ content.pricing.entry_pass }}</span>
+        <div class="mb-4 d-flex flex-wrap justify-content-center gap-2">
+            <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">Event: {{ content.event_date }} at {{ content.event_time }} | Venue: {{ content.venue }}</span>
+            <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">Our 2nd Year of HoliParty! | Entry from ₹{{ content.pricing.entry_pass }}</span>
         </div>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
             <a href="#booking" class="btn btn-primary btn-lg">Book Your Tickets</a>
@@ -159,16 +157,16 @@
         <div class="group-offer-banner mb-5">
             <div class="group-offer-inner">
                 <div class="row align-items-center g-4">
-                    <div class="col-lg-2 text-center">
+                    <div class="col-12 col-lg-2 text-center order-2 order-lg-1">
                         <span class="group-offer-icon">👥</span>
                         <h3 class="group-offer-percent mb-0">10%</h3>
                         <small class="text-white-50">OFF</small>
                     </div>
-                    <div class="col-lg-7">
+                    <div class="col-12 col-lg-7 order-1 order-lg-2">
                         <h4 class="mb-2">🎉 Group Booking Special Offer</h4>
                         <p class="mb-0 mb-lg-0">Book <strong>5 or more passes</strong> and get <strong>10% discount</strong> on your total bill! Perfect for friends, families, and colleagues. The more you book, the more you save. Apply coupon automatically at checkout when you select 5+ passes.</p>
                     </div>
-                    <div class="col-lg-3 text-center text-lg-end">
+                    <div class="col-12 col-lg-3 text-center text-lg-end order-3">
                         <span class="badge bg-light text-dark fs-6 px-3 py-2">5+ Members = 10% Off</span>
                     </div>
                 </div>

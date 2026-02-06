@@ -322,59 +322,6 @@
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contactForm');
-    const contactMessage = document.getElementById('contactMessage');
-    if (!contactForm) return;
-
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const submitBtn = document.getElementById('submitBtn');
-        const messageDiv = document.getElementById('formMessage');
-        const originalText = submitBtn.innerHTML;
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
-        if (messageDiv) messageDiv.style.display = 'none';
-
-        fetch('/contact_submit', {
-            method: 'POST',
-            body: new FormData(this),
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (messageDiv) {
-                messageDiv.style.display = 'block';
-                messageDiv.className = data.success ? 'alert alert-success' : 'alert alert-danger';
-                messageDiv.innerHTML = data.success
-                    ? '<i class="fas fa-check-circle me-2"></i>' + (data.message || 'Thank you! We will get back to you within 2 hours.')
-                    : '<i class="fas fa-exclamation-circle me-2"></i>' + (data.message || 'Something went wrong. Please try again or call us.');
-            }
-            if (data.success) contactForm.reset();
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-            setTimeout(() => { if (messageDiv) messageDiv.style.display = 'none'; }, 5000);
-        })
-        .catch(() => {
-            if (messageDiv) {
-                messageDiv.style.display = 'block';
-                messageDiv.className = 'alert alert-danger';
-                messageDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Could not send. Please try again or call us.';
-            }
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        });
-    });
-
-    if (contactMessage) {
-        contactMessage.addEventListener('input', function() {
-            if (this.value.length > 500) this.value = this.value.substring(0, 500);
-        });
-    }
-});
-</script>
 
 {% endblock %}
 
@@ -395,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <h5>Booking Help</h5>
                     <p>Questions about tickets, payments, or reservations</p>
-                    <a href="#contactForm" class="btn btn-primary btn-sm">Get Help</a>
+                    <a href="#dmSection" class="btn btn-primary btn-sm">Get Help</a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
@@ -405,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <h5>Event Info</h5>
                     <p>Details about schedule, activities, or venue</p>
-                    <a href="#contactForm" class="btn btn-success btn-sm">Learn More</a>
+                    <a href="#dmSection" class="btn btn-success btn-sm">Learn More</a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
@@ -415,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <h5>Partnership</h5>
                     <p>Business inquiries or collaboration opportunities</p>
-                    <a href="#contactForm" class="btn btn-warning btn-sm">Partner With Us</a>
+                    <a href="#dmSection" class="btn btn-warning btn-sm">Partner With Us</a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
@@ -425,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <h5>Support</h5>
                     <p>Technical issues or general assistance</p>
-                    <a href="#contactForm" class="btn btn-danger btn-sm">Get Support</a>
+                    <a href="#dmSection" class="btn btn-danger btn-sm">Get Support</a>
                 </div>
             </div>
         </div>
@@ -437,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="container">
         <div class="row g-5">
             <!-- Contact Information -->
-            <div class="col-lg-5">
+            <div class="col-12 col-lg-5">
                 <div class="contact-info-card">
                     <h2 class="mb-4">Contact Information</h2>
 
@@ -494,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <a href="#" class="social-link facebook" title="Facebook">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="#" class="social-link instagram" title="Instagram">
+                            <a href="https://www.instagram.com/spectra_events_a?igsh=MWRybXRvN3VoaG92eg==" target="_blank" rel="noopener noreferrer" class="social-link instagram" title="Instagram @SPECTRA_EVENTS_A">
                                 <i class="fab fa-instagram"></i>
                             </a>
                             <a href="#" class="social-link twitter" title="Twitter">
@@ -511,76 +458,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
 
-            <!-- Contact Form -->
-            <div class="col-lg-7">
+            <!-- DM Us on Social Media -->
+            <div class="col-12 col-lg-7" id="dmSection">
                 <div class="contact-form-card">
                     <div class="form-header">
                         <h3 class="mb-3">Send us a Message</h3>
-                        <p class="text-muted mb-0">Fill out the form below and we'll get back to you as soon as possible.</p>
+                        <p class="text-muted mb-0">DM us directly on our Instagram handle. We respond within 2 hours!</p>
                     </div>
-
-                    <form id="contactForm" action="/contact_submit" method="POST">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="contactName" class="form-label">Full Name *</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    <input type="text" class="form-control" id="contactName" name="name" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="contactEmail" class="form-label">Email Address *</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input type="email" class="form-control" id="contactEmail" name="email" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="contactPhone" class="form-label">Phone Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                <input type="tel" class="form-control" id="contactPhone" name="phone" placeholder="Optional">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="contactSubject" class="form-label">Subject *</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                                <select class="form-select" id="contactSubject" name="subject" required>
-                                    <option value="">Select a subject</option>
-                                    <option value="booking">Booking & Tickets</option>
-                                    <option value="event">Event Information</option>
-                                    <option value="partnership">Partnership & Sponsorship</option>
-                                    <option value="technical">Technical Support</option>
-                                    <option value="feedback">Feedback & Suggestions</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="contactMessage" class="form-label">Message *</label>
-                            <textarea class="form-control" id="contactMessage" name="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
-                            <div class="form-text">Maximum 500 characters</div>
-                        </div>
-
-                        <!-- Newsletter Signup -->
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="newsletterSignup">
-                                <label class="form-check-label" for="newsletterSignup">
-                                    Subscribe to our newsletter for event updates and special offers
-                                </label>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
-                            <i class="fas fa-paper-plane me-2"></i>Send Message
-                        </button>
-                    </form>
-
-                    <!-- Success/Error Messages -->
-                    <div id="formMessage" class="mt-3" style="display: none;"></div>
+                    <div class="text-center py-4">
+                        <p class="mb-4">Scan the QR code or click the link below to message us on Instagram.</p>
+                        <a href="https://www.instagram.com/spectra_events_a?igsh=MWRybXRvN3VoaG92eg==" target="_blank" rel="noopener noreferrer" class="d-inline-block text-decoration-none">
+                            <img src="{{ url_for('static', filename='images/instagram-qr.png') }}" alt="Instagram @SPECTRA_EVENTS_A" class="img-fluid rounded shadow" style="max-width: 220px;">
+                            <p class="mt-3 fw-bold text-primary mb-0">@SPECTRA_EVENTS_A</p>
+                            <span class="btn btn-primary mt-2"><i class="fab fa-instagram me-2"></i>Message us on Instagram</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
