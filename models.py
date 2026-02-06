@@ -129,7 +129,7 @@ class EventContent:
     JSON_FILE = _data_path('event_content.json')
     
     DEFAULT_CONTENT = {
-        'event_date': 'March 4, 2026',
+        'event_date': 'March 3, 2026',
         'event_time': '10:00 AM – 5:00 PM',
         'venue': 'Dighi Garden Mankundu',
         'organizer': 'Spectra Group',
@@ -139,9 +139,9 @@ class EventContent:
         ],
         'pricing': {
             'entry_pass': 200,
-            'entry_plus_starter': 350,
+            'entry_plus_starter': 349,
             'entry_plus_starter_lunch': 499,
-            'food_available': 'Veg and Non-Veg options available at counters'
+            'food_available': 'Food & drink available at counter'
         },
         'complimentary': 'Abir & Special Lassi',
         'offers': '',

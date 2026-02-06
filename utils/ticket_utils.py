@@ -72,7 +72,8 @@ def generate_ticket_pdf(booking):
 
     # Other details
     pdf.cell(0, 6, txt=f"Passes: {booking['passes']} | Type: {pass_label}", ln=1)
-    pdf.cell(0, 6, txt=f"Date: March 4, 2026 | Time: 10:00 AM - 5:00 PM", ln=1)
+    event_date = booking.get('event_date', 'March 3, 2026')
+    pdf.cell(0, 6, txt=f"Date: {event_date} | Time: 10:00 AM - 5:00 PM", ln=1)
     pdf.cell(0, 6, txt=f"Venue: {venue}", ln=1)
     pdf.cell(0, 6, txt="Complimentary: Abir & Special Lassi", ln=1)
     pdf.ln(5)

@@ -39,7 +39,7 @@ def create_success_email_template(booking, event_content):
     # Get pricing details
     pricing = event_content.get('pricing', {})
     entry_pass_price = pricing.get('entry_pass', 200)
-    entry_starter_price = pricing.get('entry_plus_starter', 350)
+    entry_starter_price = pricing.get('entry_plus_starter', 349)
     entry_lunch_price = pricing.get('entry_plus_starter_lunch', 499)
     
     # Calculate plan details
@@ -48,12 +48,12 @@ def create_success_email_template(booking, event_content):
     amount = booking.get('amount', passes * entry_pass_price)
     
     # Get event details
-    event_date = event_content.get('event_date', 'March 4, 2026')
+    event_date = event_content.get('event_date', 'March 3, 2026')
     event_time = event_content.get('event_time', '10:00 AM – 5:00 PM')
     venue = event_content.get('venue', 'Dighi Garden Mankundu')
     organizer = event_content.get('organizer', 'Spectra Group')
     complimentary = event_content.get('complimentary', 'Abir & Special Lassi')
-    food_available = pricing.get('food_available', 'Veg and Non-Veg options available at counters')
+    food_available = pricing.get('food_available', 'Food & drink available at counter')
     
     # Get contact persons
     contact_persons = event_content.get('contact_persons', [])
@@ -554,6 +554,31 @@ def _send_via_resend(to, subject, body, attachment=None, from_email=None):
         import traceback
         traceback.print_exc()
         return False
+
+
+def send_contact_form_email(name, email, phone, subject, message):
+    """
+    Send contact form submission to the configured CONTACT_EMAIL inbox.
+    Returns True on success, False otherwise.
+    """
+    to_email = getattr(Config, 'CONTACT_EMAIL', None) or 'spectraholi2026@gmail.com'
+    to_email = str(to_email).strip()
+    if not to_email:
+        print("CONTACT_EMAIL not set, cannot send contact form")
+        return False
+
+    subject_line = f"Spectra HoliParty Contact: {subject}" if subject else "Spectra HoliParty - New Contact Form Message"
+    body = f"""
+    <h2>New Contact Form Message</h2>
+    <p><strong>From:</strong> {name}</p>
+    <p><strong>Email:</strong> {email}</p>
+    <p><strong>Phone:</strong> {phone or 'Not provided'}</p>
+    <p><strong>Subject:</strong> {subject or 'Not specified'}</p>
+    <hr>
+    <p><strong>Message:</strong></p>
+    <p>{message}</p>
+    """
+    return send_email(to_email, subject_line, body)
 
 
 def send_email(to, subject, body, attachment=None):

@@ -17,3 +17,5 @@ services:
       - key: GOOGLE_SHEET_ID
         value: 13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew
       - key: GOOGLE_CREDS_PATH
+      - key: CONTACT_EMAIL
+        value: spectraholi2026@gmail.com

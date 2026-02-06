@@ -33,6 +33,8 @@ class Config:
     
     # Common email from address (used by sendgrid, mailgun)
     EMAIL_FROM = (os.environ.get('EMAIL_FROM') or '').strip()
+    # Contact form submissions are sent to this inbox
+    CONTACT_EMAIL = (os.environ.get('CONTACT_EMAIL') or 'spectraholi2026@gmail.com').strip()
     GOOGLE_SHEET_ID = os.environ.get('GOOGLE_SHEET_ID') or '13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew'
     GOOGLE_CREDS_PATH = os.environ.get('GOOGLE_CREDS_PATH') or 'creds.json'
 

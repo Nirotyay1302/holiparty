@@ -62,7 +62,7 @@ def add_cache_headers(response):
 
 # Lazy imports for heavy modules (speeds up cold start)
 from models import Booking, EventContent
-from utils.email_utils import send_email, create_success_email_template
+from utils.email_utils import send_email, send_contact_form_email, create_success_email_template
 from utils.qr_utils import generate_qr
 from utils.excel_utils import update_sheet, export_to_google_sheets, sync_sheet_after_delete, upsert_booking_row, delete_booking_from_sheet
 from utils.ticket_utils import generate_ticket_pdf
@@ -99,8 +99,11 @@ def contact_submit():
         message = request.form.get('message', '').strip()
         if not name or not email or not message:
             return jsonify({'success': False, 'message': 'Please fill in all required fields.'})
-        # Store or email logic could go here; for now acknowledge receipt
-        return jsonify({'success': True, 'message': 'Thank you for your message! We will get back to you within 2 hours.'})
+        # Send message to spectraholi2026@gmail.com (or CONTACT_EMAIL)
+        sent = send_contact_form_email(name, email, phone, subject, message)
+        if sent:
+            return jsonify({'success': True, 'message': 'Thank you for your message! We will get back to you within 2 hours.'})
+        return jsonify({'success': False, 'message': 'Could not send email. Please try again or call us.'})
     except Exception as e:
         print(f"Contact submit error: {e}")
         return jsonify({'success': False, 'message': 'Could not send. Please try again.'})
@@ -209,7 +212,8 @@ def update_booking_status():
         if new_status == 'Paid' and old_status != 'Paid':
             content = EventContent.get_content()
             venue = content.get('venue', 'Dighi Garden Mankundu')
-            booking_with_venue = {**booking, 'venue': venue, 'payment_status': new_status}
+            event_date = content.get('event_date', 'March 3, 2026')
+            booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date, 'payment_status': new_status}
             
             email_sent = False
             try:
@@ -371,7 +375,8 @@ def admin_send_mail():
         
         content = EventContent.get_content()
         venue = content.get('venue', 'Dighi Garden Mankundu')
-        booking_with_venue = {**booking, 'venue': venue}
+        event_date = content.get('event_date', 'March 3, 2026')
+        booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date}
         
         if mail_type == 'success':
             try:

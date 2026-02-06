@@ -140,3 +140,4 @@ Netlify is for static sites. For this Flask app:
 | `RESEND_FROM_EMAIL` | Yes | Verified sender email (use `onboarding@resend.dev` for testing) |
 | `GOOGLE_SHEET_ID` | Yes | `13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew` |
 | `GOOGLE_CREDS_PATH` | Yes | Path to `creds.json` (service account) |
+| `CONTACT_EMAIL` | No | Inbox for contact form (default: spectraholi2026@gmail.com) |

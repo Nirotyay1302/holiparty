@@ -6,7 +6,7 @@ function updateCountdown() {
     const secondsEl = document.getElementById('seconds');
     if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
 
-    const eventDate = new Date('March 4, 2026 10:00:00').getTime();
+    const eventDate = new Date('February 28, 2026 23:59:59').getTime(); // Last date of registration
     const now = new Date().getTime();
     const distance = eventDate - now;
 
