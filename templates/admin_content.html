@@ -6,14 +6,15 @@
 
     <!-- Success/Error Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show"
+        role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 
     <div class="row">
@@ -28,13 +29,24 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="event_date" class="form-label">Event Date</label>
-                                    <input type="text" class="form-control" id="event_date" name="event_date" value="{{ content.event_date }}" required>
+                                    <input type="text" class="form-control" id="event_date" name="event_date"
+                                        value="{{ content.event_date }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="registration_deadline" class="form-label">Registration Deadline</label>
+                                    <input type="text" class="form-control" id="registration_deadline"
+                                        name="registration_deadline"
+                                        value="{{ content.get('registration_deadline', 'February 28, 2026') }}"
+                                        required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="event_time" class="form-label">Event Time</label>
-                                    <input type="text" class="form-control" id="event_time" name="event_time" value="{{ content.event_time }}" required>
+                                    <input type="text" class="form-control" id="event_time" name="event_time"
+                                        value="{{ content.event_time }}" required>
                                 </div>
                             </div>
                         </div>
@@ -43,20 +55,23 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="venue" class="form-label">Venue</label>
-                                    <input type="text" class="form-control" id="venue" name="venue" value="{{ content.venue }}" required>
+                                    <input type="text" class="form-control" id="venue" name="venue"
+                                        value="{{ content.venue }}" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="organizer" class="form-label">Organizer</label>
-                                    <input type="text" class="form-control" id="organizer" name="organizer" value="{{ content.organizer }}" required>
+                                    <input type="text" class="form-control" id="organizer" name="organizer"
+                                        value="{{ content.organizer }}" required>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="complimentary" class="form-label">Complimentary Items</label>
-                            <input type="text" class="form-control" id="complimentary" name="complimentary" value="{{ content.complimentary }}" required>
+                            <input type="text" class="form-control" id="complimentary" name="complimentary"
+                                value="{{ content.complimentary }}" required>
                         </div>
 
                         <h6 class="mt-4 mb-3">Pricing Information</h6>
@@ -64,43 +79,53 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="entry_pass" class="form-label">Entry Pass (₹)</label>
-                                    <input type="number" class="form-control" id="entry_pass" name="entry_pass" value="{{ content.pricing.entry_pass }}" required>
+                                    <input type="number" class="form-control" id="entry_pass" name="entry_pass"
+                                        value="{{ content.pricing.entry_pass }}" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="entry_plus_starter" class="form-label">Entry + Starter (₹)</label>
-                                    <input type="number" class="form-control" id="entry_plus_starter" name="entry_plus_starter" value="{{ content.pricing.entry_plus_starter }}" required>
+                                    <input type="number" class="form-control" id="entry_plus_starter"
+                                        name="entry_plus_starter" value="{{ content.pricing.entry_plus_starter }}"
+                                        required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="entry_plus_starter_lunch" class="form-label">Entry + Starter + Lunch (₹)</label>
-                                    <input type="number" class="form-control" id="entry_plus_starter_lunch" name="entry_plus_starter_lunch" value="{{ content.pricing.get('entry_plus_starter_lunch', 499) }}" required>
+                                    <label for="entry_plus_starter_lunch" class="form-label">Entry + Starter + Lunch
+                                        (₹)</label>
+                                    <input type="number" class="form-control" id="entry_plus_starter_lunch"
+                                        name="entry_plus_starter_lunch"
+                                        value="{{ content.pricing.get('entry_plus_starter_lunch', 499) }}" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="food_available" class="form-label">Food Options</label>
-                                    <input type="text" class="form-control" id="food_available" name="food_available" value="{{ content.pricing.food_available }}" required>
+                                    <input type="text" class="form-control" id="food_available" name="food_available"
+                                        value="{{ content.pricing.food_available }}" required>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="offers" class="form-label">Current Offers/Special Announcements</label>
-                            <textarea class="form-control" id="offers" name="offers" rows="3">{{ content.offers }}</textarea>
+                            <textarea class="form-control" id="offers" name="offers"
+                                rows="3">{{ content.offers }}</textarea>
                         </div>
 
                         <h6 class="mt-4 mb-3">Images & Media</h6>
                         <div class="mb-3">
                             <label for="hero_image" class="form-label">Hero Image URL</label>
-                            <input type="url" class="form-control" id="hero_image" name="hero_image" value="{{ content.hero_image }}">
+                            <input type="url" class="form-control" id="hero_image" name="hero_image"
+                                value="{{ content.hero_image }}">
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Gallery Images (one URL per line)</label>
-                            <textarea class="form-control" name="gallery_images" rows="5" placeholder="Enter image URLs, one per line">{% for img in content.gallery_images %}{{ img }}
+                            <textarea class="form-control" name="gallery_images" rows="5"
+                                placeholder="Enter image URLs, one per line">{% for img in content.gallery_images %}{{ img }}
 {% endfor %}</textarea>
                         </div>
 
@@ -117,7 +142,8 @@
                 </div>
                 <div class="card-body">
                     <a href="{{ url_for('admin') }}" class="btn btn-outline-primary w-100 mb-2">📊 View Bookings</a>
-                    <a href="{{ url_for('export_bookings') }}" class="btn btn-outline-success w-100 mb-2">📊 Export Bookings</a>
+                    <a href="{{ url_for('export_bookings') }}" class="btn btn-outline-success w-100 mb-2">📊 Export
+                        Bookings</a>
                     <a href="/" class="btn btn-outline-info w-100 mb-2" target="_blank">🏠 View Website</a>
                     <a href="{{ url_for('admin_login') }}" class="btn btn-outline-danger w-100">🚪 Logout</a>
                 </div>
@@ -134,7 +160,8 @@
                     <p><strong>Organizer:</strong> {{ content.organizer }}</p>
                     <p><strong>Entry:</strong> ₹{{ content.pricing.entry_pass }}</p>
                     <p><strong>Entry + Starter:</strong> ₹{{ content.pricing.entry_plus_starter }}</p>
-                    <p><strong>Entry + Starter + Lunch:</strong> ₹{{ content.pricing.get('entry_plus_starter_lunch', 499) }}</p>
+                    <p><strong>Entry + Starter + Lunch:</strong> ₹{{ content.pricing.get('entry_plus_starter_lunch',
+                        499) }}</p>
                 </div>
             </div>
         </div>
@@ -142,22 +169,22 @@
 </div>
 
 <script>
-// Handle gallery images textarea
-document.querySelector('form').addEventListener('submit', function(e) {
-    const galleryTextarea = document.querySelector('[name="gallery_images"]');
-    const galleryImages = galleryTextarea.value.trim().split('\n').filter(url => url.trim());
-    
-    // Clear existing hidden inputs
-    document.querySelectorAll('input[name="gallery_images[]"]').forEach(input => input.remove());
-    
-    // Add hidden inputs for each gallery image
-    galleryImages.forEach(url => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'gallery_images[]';
-        input.value = url.trim();
-        this.appendChild(input);
+    // Handle gallery images textarea
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const galleryTextarea = document.querySelector('[name="gallery_images"]');
+        const galleryImages = galleryTextarea.value.trim().split('\n').filter(url => url.trim());
+
+        // Clear existing hidden inputs
+        document.querySelectorAll('input[name="gallery_images[]"]').forEach(input => input.remove());
+
+        // Add hidden inputs for each gallery image
+        galleryImages.forEach(url => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'gallery_images[]';
+            input.value = url.trim();
+            this.appendChild(input);
+        });
     });
-});
 </script>
 {% endblock %}

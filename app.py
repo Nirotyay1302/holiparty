@@ -70,9 +70,9 @@ from utils.ticket_utils import generate_ticket_pdf
 # Razorpay client
 # razorpay_client = razorpay.Client(auth=(app.config['RAZORPAY_KEY_ID'], app.config['RAZORPAY_KEY_SECRET']))
 
-# Admin credentials (in production, use environment variables)
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'holi2026'
+# Admin credentials
+# ADMIN_USERNAME = app.config['ADMIN_USERNAME']
+# ADMIN_PASSWORD = app.config['ADMIN_PASSWORD']
 
 @app.route('/')
 def home():
@@ -125,7 +125,7 @@ def admin_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        if username == app.config['ADMIN_USERNAME'] and password == app.config['ADMIN_PASSWORD']:
             session['admin_logged_in'] = True
             return redirect(url_for('admin'))
         else:
@@ -168,11 +168,16 @@ def payment():
 @app.route('/confirm_payment', methods=['POST'])
 def confirm_payment():
     ticket_id = request.form['ticket_id']
+    transaction_id = request.form.get('transaction_id', '').strip()
 
     booking = Booking.find_one(ticket_id=ticket_id)
     if booking:
         # Booking.update_one() now handles Google Sheet automatically (primary store)
-        Booking.update_one({'ticket_id': ticket_id}, {'$set': {'payment_status': 'Awaiting Verification'}})
+        update_data = {'payment_status': 'Awaiting Verification'}
+        if transaction_id:
+            update_data['transaction_id'] = transaction_id
+            
+        Booking.update_one({'ticket_id': ticket_id}, {'$set': update_data})
 
     # Do not send ticket yet - wait for admin verification
     return render_template('success.html', awaiting_verification=True)
@@ -264,6 +269,7 @@ def admin_content():
         gallery_images = [x.strip() for x in request.form.getlist('gallery_images[]') if str(x).strip()]
         content = {
             'event_date': request.form['event_date'],
+            'registration_deadline': request.form.get('registration_deadline', 'February 28, 2026'),
             'event_time': request.form['event_time'],
             'venue': request.form['venue'],
             'organizer': request.form['organizer'],
@@ -421,6 +427,7 @@ def admin_send_mail():
             <h2>Dear {booking['name']},</h2>
             <p>Greetings from <strong>Spectra Team</strong>!</p>
             <p>We noticed your booking for <strong>Spectra HoliParty 2026</strong> (Ticket ID: {booking['ticket_id']}) could not be confirmed due to payment verification issues.</p>
+            {f"<p>Transaction ID submitted: {booking.get('transaction_id', 'Not provided')}</p>" if booking.get('transaction_id') else ""}
             <p>If you have already made the payment, please contact us with your Ticket ID for manual verification.</p>
             <p>For any queries, reach us at the numbers on our website.</p>
             <p>— Spectra HoliParty Team</p>
@@ -465,9 +472,10 @@ def export_bookings():
             'Entry Status': booking.get('entry_status', 'Not Used'),
             'Booking Date': bdate,
             'Pass Type': booking.get('pass_type', 'entry'),
+            'Transaction ID': booking.get('transaction_id', ''),
         })
 
-    rows = [[r['Name'], r['Email'], r['Phone'], r['Ticket ID'], r['Passes'], r['Amount'], r['Payment Status'], r['Entry Status'], str(r['Booking Date']), r['Pass Type']] for r in data]
+    rows = [[r['Name'], r['Email'], r['Phone'], r['Ticket ID'], r['Passes'], r['Amount'], r['Payment Status'], r['Entry Status'], str(r['Booking Date']), r['Pass Type'], r['Transaction ID']] for r in data]
     export_to_google_sheets(rows)
 
     df = pd.DataFrame(data)

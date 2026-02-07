@@ -42,3 +42,7 @@ class Config:
     # On Render free tier this remains ephemeral. If you attach a disk, set:
     # DATA_DIR=/var/data (and mount a disk there).
     DATA_DIR = (os.environ.get('DATA_DIR') or '').strip()
+
+    # Admin Login Credentials
+    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME') or 'admin'
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'holi2026'

@@ -130,6 +130,7 @@ class EventContent:
     
     DEFAULT_CONTENT = {
         'event_date': 'March 3, 2026',
+        'registration_deadline': 'February 28, 2026',
         'event_time': '10:00 AM – 5:00 PM',
         'venue': 'Kunjachaya, Bhadreswar',
         'organizer': 'Spectra Group',
@@ -258,7 +259,7 @@ class Booking:
                 pass
         return None
 
-    def __init__(self, name, email, phone, address, passes, ticket_id, order_id, payment_status='Pending', entry_status='Not Used', pass_type='entry', amount=None, is_group_booking=False):
+    def __init__(self, name, email, phone, address, passes, ticket_id, order_id, payment_status='Pending', entry_status='Not Used', pass_type='entry', amount=None, is_group_booking=False, transaction_id=''):
         self.name = name
         self.email = email
         self.phone = phone
@@ -271,6 +272,7 @@ class Booking:
         self.pass_type = pass_type
         self.amount = amount if amount is not None else passes * 200
         self.is_group_booking = is_group_booking
+        self.transaction_id = transaction_id
         self.booking_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def save(self):

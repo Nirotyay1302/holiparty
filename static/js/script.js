@@ -6,7 +6,13 @@ function updateCountdown() {
     const secondsEl = document.getElementById('seconds');
     if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
 
-    const eventDate = new Date('February 28, 2026 23:59:59').getTime(); // Last date of registration
+    const timerEl = document.querySelector('.countdown-timer');
+    if (!timerEl) return;
+    
+    // Get date from data attribute or fallback to hardcoded
+    const dateStr = timerEl.getAttribute('data-event-date') || 'February 28, 2026';
+    // Append time to ensure it counts down to end of that day (or start, depending on need. User said "Last Date of Registration", usually implies end of day)
+    const eventDate = new Date(dateStr + ' 23:59:59').getTime();
     const now = new Date().getTime();
     const distance = eventDate - now;
 
