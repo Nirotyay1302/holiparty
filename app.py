@@ -211,7 +211,7 @@ def update_booking_status():
         # If status changed to Paid and wasn't before, send ticket email
         if new_status == 'Paid' and old_status != 'Paid':
             content = EventContent.get_content()
-            venue = content.get('venue', 'Dighi Garden Mankundu')
+            venue = content.get('venue', 'Kunjachaya, Bhadreswar')
             event_date = content.get('event_date', 'March 3, 2026')
             booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date, 'payment_status': new_status}
             
@@ -374,7 +374,7 @@ def admin_send_mail():
                 })
         
         content = EventContent.get_content()
-        venue = content.get('venue', 'Dighi Garden Mankundu')
+        venue = content.get('venue', 'Kunjachaya, Bhadreswar')
         event_date = content.get('event_date', 'March 3, 2026')
         booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date}
         

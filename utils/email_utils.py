@@ -50,7 +50,7 @@ def create_success_email_template(booking, event_content):
     # Get event details
     event_date = event_content.get('event_date', 'March 3, 2026')
     event_time = event_content.get('event_time', '10:00 AM – 5:00 PM')
-    venue = event_content.get('venue', 'Dighi Garden Mankundu')
+    venue = event_content.get('venue', 'Kunjachaya, Bhadreswar')
     organizer = event_content.get('organizer', 'Spectra Group')
     complimentary = event_content.get('complimentary', 'Abir & Special Lassi')
     food_available = pricing.get('food_available', 'Food & drink available at counter')
