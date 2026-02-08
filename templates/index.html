@@ -129,47 +129,68 @@
 <!-- Previous Year Photos -->
 <section id="photos" class="py-5 bg-light">
     <div class="container">
-        <h2 class="text-center mb-4 section-title">Previous Year Photos</h2>
+        <h2 class="text-center mb-4 section-title">Previous Year Memories</h2>
         <p class="text-center mb-5">Relive the colorful moments from our past celebrations. Be part of this year's
             unforgettable memories!</p>
-        <div class="row g-4">
-            <!-- Featured photo - image 1.jpeg -->
+        <div class="row g-4 justify-content-center">
+            <!-- Video Highlights -->
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 photo-card overflow-hidden">
-                    <img src="{{ url_for('static', filename='images/image 1.jpeg') }}" alt="Holi Party 2025"
-                        class="card-img-top" style="height: 250px; object-fit: cover;">
+                <div class="card h-100 photo-card overflow-hidden shadow-sm border-0 rounded-4">
+                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls preload="metadata"
+                        poster="{{ url_for('static', filename='images/image 1.jpeg') }}">
+                        <source src="{{ url_for('static', filename='images/h1.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                     <div class="card-body">
-                        <h5 class="card-title mb-0">2025</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Holi celebration photos -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 photo-card overflow-hidden">
-                    <img src="{{ url_for('static', filename='images/holi-spectra-group.png') }}"
-                        alt="Spectra Holi celebration – group with colors" class="card-img-top"
-                        style="height: 250px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title mb-0">Spectra Holi</h5>
+                        <h5 class="card-title mb-0">Holi Vibes</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 photo-card overflow-hidden">
-                    <img src="{{ url_for('static', filename='images/holi-women.png') }}"
-                        alt="Holi – friends applying color" class="card-img-top"
-                        style="height: 250px; object-fit: cover;">
+                <div class="card h-100 photo-card overflow-hidden shadow-sm border-0 rounded-4">
+                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls preload="metadata"
+                        poster="{{ url_for('static', filename='images/holi-spectra-group.png') }}">
+                        <source src="{{ url_for('static', filename='images/h2.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                     <div class="card-body">
                         <h5 class="card-title mb-0">Celebration</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 photo-card overflow-hidden">
-                    <img src="{{ url_for('static', filename='images/holi-canopy.png') }}" alt="Holi under the canopy"
-                        class="card-img-top" style="height: 250px; object-fit: cover;">
+                <div class="card h-100 photo-card overflow-hidden shadow-sm border-0 rounded-4">
+                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls preload="metadata"
+                        poster="{{ url_for('static', filename='images/holi-women.png') }}">
+                        <source src="{{ url_for('static', filename='images/h3.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                     <div class="card-body">
-                        <h5 class="card-title mb-0">Festival vibes</h5>
+                        <h5 class="card-title mb-0">Colors of Joy</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 photo-card overflow-hidden shadow-sm border-0 rounded-4">
+                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls preload="metadata"
+                        poster="{{ url_for('static', filename='images/holi-canopy.png') }}">
+                        <source src="{{ url_for('static', filename='images/h4.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">Festival Fun</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 photo-card overflow-hidden shadow-sm border-0 rounded-4">
+                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls preload="metadata"
+                        poster="{{ url_for('static', filename='images/image 1.jpeg') }}">
+                        <source src="{{ url_for('static', filename='images/h5.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">Unforgettable Moments</h5>
                     </div>
                 </div>
             </div>
