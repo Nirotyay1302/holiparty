@@ -265,10 +265,10 @@
                                 <label class="form-label">Pass Type *</label>
                                 <div class="row g-2">
                                     <div class="col-12">
-                                        <div class="form-check border rounded p-3 pass-option" data-type="entry"
-                                            data-price="{{ content.pricing.entry_pass }}">
+                                        <div class="form-check border rounded p-3 pass-option" data-type="entry">
                                             <input class="form-check-input" type="radio" name="pass_type_radio"
-                                                id="passEntry" value="entry" checked>
+                                                id="passEntry" value="entry"
+                                                data-price="{{ content.pricing.entry_pass }}" checked>
                                             <label class="form-check-label w-100" for="passEntry">
                                                 <strong>Entry Only</strong> – ₹{{ content.pricing.entry_pass
                                                 }}/person<br>
@@ -278,10 +278,11 @@
                                         </div>
                                     </div>
                                     <div class="col-12">
-                                        <div class="form-check border rounded p-3 pass-option" data-type="entry_starter"
-                                            data-price="{{ content.pricing.entry_plus_starter }}">
+                                        <div class="form-check border rounded p-3 pass-option"
+                                            data-type="entry_starter">
                                             <input class="form-check-input" type="radio" name="pass_type_radio"
-                                                id="passStarter" value="entry_starter">
+                                                id="passStarter" value="entry_starter"
+                                                data-price="{{ content.pricing.entry_plus_starter }}">
                                             <label class="form-check-label w-100" for="passStarter">
                                                 <strong>Entry + Starter</strong> – ₹{{
                                                 content.pricing.entry_plus_starter }}/person<br>
@@ -292,10 +293,10 @@
                                     </div>
                                     <div class="col-12">
                                         <div class="form-check border rounded p-3 pass-option"
-                                            data-type="entry_starter_lunch"
-                                            data-price="{{ content.pricing.get('entry_plus_starter_lunch', 499) }}">
+                                            data-type="entry_starter_lunch">
                                             <input class="form-check-input" type="radio" name="pass_type_radio"
-                                                id="passLunch" value="entry_starter_lunch">
+                                                id="passLunch" value="entry_starter_lunch"
+                                                data-price="{{ content.pricing.get('entry_plus_starter_lunch', 499) }}">
                                             <label class="form-check-label w-100" for="passLunch">
                                                 <strong>Entry + Starter + Lunch</strong> – ₹{{
                                                 content.pricing.get('entry_plus_starter_lunch', 499) }}/person<br>
@@ -394,13 +395,17 @@
     </div>
 </section>
 <script>
-    const PRICES = { entry: {{ content.pricing.entry_pass }}, entry_starter: { { content.pricing.entry_plus_starter } }, entry_starter_lunch: { { content.pricing.get('entry_plus_starter_lunch', 499) } } };
     const PASS_LABELS = { entry: 'Entry Only', entry_starter: 'Entry + Starter', entry_starter_lunch: 'Entry + Starter + Lunch' };
 
     function updateBookingTotal() {
         const passes = parseInt(document.getElementById('passes').value) || 1;
-        const passType = document.querySelector('input[name="pass_type_radio"]:checked').value;
-        const pricePerPerson = PRICES[passType] || 200;
+        const selectedRadio = document.querySelector('input[name="pass_type_radio"]:checked');
+
+        if (!selectedRadio) return;
+
+        const passType = selectedRadio.value;
+        const pricePerPerson = parseInt(selectedRadio.getAttribute('data-price')) || 200;
+
         let subtotal = passes * pricePerPerson;
         const isGroup = passes >= 5;
         const discount = isGroup ? Math.round(subtotal * 0.1) : 0;
@@ -412,14 +417,43 @@
         document.getElementById('total').textContent = total;
         document.getElementById('buttonTotal').textContent = total;
         document.getElementById('selectedPasses').textContent = passes;
-        document.getElementById('passTypeLabel').textContent = PASS_LABELS[passType];
+        document.getElementById('passTypeLabel').textContent = PASS_LABELS[passType] || 'Entry Only';
         document.getElementById('groupDiscountText').style.display = isGroup ? 'block' : 'none';
         document.getElementById('discountLine').style.display = isGroup ? 'inline' : 'none';
+
+        // Highlight selected option
+        document.querySelectorAll('.pass-option').forEach(opt => {
+            opt.classList.remove('border-primary', 'bg-light');
+            if (opt.querySelector('input').checked) {
+                opt.classList.add('border-primary', 'bg-light');
+            }
+        });
     }
 
-    document.querySelectorAll('input[name="pass_type_radio"]').forEach(r => r.addEventListener('change', updateBookingTotal));
-    document.getElementById('passes').addEventListener('change', updateBookingTotal);
-    updateBookingTotal();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach change listeners
+        document.querySelectorAll('input[name="pass_type_radio"]').forEach(r => {
+            r.addEventListener('change', updateBookingTotal);
+        });
+
+        document.getElementById('passes').addEventListener('change', updateBookingTotal);
+
+        // Initial calculation
+        updateBookingTotal();
+
+        // Make whole card clickable
+        document.querySelectorAll('.pass-option').forEach(opt => {
+            opt.addEventListener('click', function (e) {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        });
+    });
 
     // Form validation
     document.getElementById('bookingForm').addEventListener('submit', function (e) {
