@@ -236,7 +236,7 @@
                     <div class="card-body">
                         <form id="bookingForm" action="/create_order" method="POST">
                             <input type="hidden" id="pass_type" name="pass_type" value="entry">
-                            <input type="hidden" id="amount" name="amount" value="200">
+                            <input type="hidden" id="amount" name="amount" value="{{ content.pricing.entry_pass }}">
                             <div class="mb-4">
                                 <label for="name" class="form-label">Full Name *</label>
                                 <input type="text" class="form-control" id="name" name="name"
@@ -324,7 +324,7 @@
                             </div>
                             <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn"
                                 style="background: linear-gradient(45deg, #ff2f92, #ffd400); border: none;">
-                                Proceed to Payment - ₹<span id="buttonTotal">200</span>
+                                Proceed to Payment - ₹<span id="buttonTotal">{{ content.pricing.entry_pass }}</span>
                             </button>
                         </form>
                     </div>
@@ -344,10 +344,10 @@
                             <p class="mb-0">Selected: <strong><span id="selectedPasses">1</span> pass(es)</strong> –
                                 <span id="passTypeLabel">Entry Only</span>
                             </p>
-                            <p class="mb-0 mt-1">Subtotal: ₹<span id="subtotal">200</span> <span id="discountLine"
-                                    style="display: none;">– 10% group discount</span></p>
+                            <p class="mb-0 mt-1">Subtotal: ₹<span id="subtotal">{{ content.pricing.entry_pass }}</span>
+                                <span id="discountLine" style="display: none;">– 10% group discount</span></p>
                             <p class="mb-0"><strong style="color: #ff2f92; font-size: 1.2em;">Total: ₹<span
-                                        id="total">200</span></strong></p>
+                                        id="total">{{ content.pricing.entry_pass }}</span></strong></p>
                         </div>
                         <h6>🎉 What's Included:</h6>
                         <ul class="list-unstyled">

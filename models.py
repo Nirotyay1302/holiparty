@@ -259,7 +259,7 @@ class Booking:
                 pass
         return None
 
-    def __init__(self, name, email, phone, address, passes, ticket_id, order_id, payment_status='Pending', entry_status='Not Used', pass_type='entry', amount=None, is_group_booking=False, transaction_id=''):
+    def __init__(self, name, email, phone, address, passes, ticket_id, order_id, payment_status='Pending', entry_status='Not Used', pass_type='entry', amount=None, is_group_booking=False, transaction_id='', pricing=None):
         self.name = name
         self.email = email
         self.phone = phone
@@ -273,6 +273,7 @@ class Booking:
         self.amount = amount if amount is not None else passes * 200
         self.is_group_booking = is_group_booking
         self.transaction_id = transaction_id
+        self.pricing = pricing or {}
         self.booking_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def save(self):

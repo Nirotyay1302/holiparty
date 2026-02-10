@@ -117,8 +117,27 @@ def admin():
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin_login'))
     bookings = Booking.find_all()
-    total_revenue = sum(b.get('amount', b.get('passes', 0) * 200) for b in bookings if b.get('payment_status') == 'Paid')
-    return render_template('admin.html', bookings=bookings, total_revenue=total_revenue)
+    
+    # Calculate revenue with better fallback
+    content = EventContent.get_content()
+    pricing = content.get('pricing', {})
+    
+    total_revenue = 0
+    for b in bookings:
+        if b.get('payment_status') == 'Paid':
+            amount = b.get('amount')
+            if amount is not None:
+                total_revenue += amount
+            else:
+                # Fallback
+                p_type = b.get('pass_type', 'entry')
+                price = 200
+                if p_type == 'entry': price = pricing.get('entry_pass', 200)
+                elif p_type == 'entry_starter': price = pricing.get('entry_plus_starter', 349)
+                elif p_type == 'entry_starter_lunch': price = pricing.get('entry_plus_starter_lunch', 499)
+                total_revenue += b.get('passes', 1) * price
+
+    return render_template('admin.html', bookings=bookings, total_revenue=total_revenue, content=content)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -141,13 +160,33 @@ def create_order():
     address = request.form['address']
     passes = int(request.form['passes'])
     pass_type = request.form.get('pass_type', 'entry')
-    amount = int(request.form.get('amount', passes * 200))
+    
+    # Calculate amount server-side (do not trust client)
+    content = EventContent.get_content()
+    pricing = content.get('pricing', {})
+    
+    price_per_pass = 200 # Absolute fallback
+    if pass_type == 'entry':
+        price_per_pass = pricing.get('entry_pass', 200)
+    elif pass_type == 'entry_starter':
+        price_per_pass = pricing.get('entry_plus_starter', 349)
+    elif pass_type == 'entry_starter_lunch':
+        price_per_pass = pricing.get('entry_plus_starter_lunch', 499)
+        
+    base_amount = passes * price_per_pass
     is_group_booking = passes >= 5
+    
+    # Apply group discount (10%)
+    discount = 0
+    if is_group_booking:
+        discount = int(base_amount * 0.1)
+        
+    amount = base_amount - discount
 
     print(f"Booking: {name}, {email}, {phone}, {address}, {passes} passes, {pass_type}, amount {amount}")
 
     ticket_id = str(uuid.uuid4())[:8].upper()
-    booking = Booking(name=name, email=email, phone=phone, address=address, passes=passes, ticket_id=ticket_id, order_id=ticket_id, payment_status='Pending', pass_type=pass_type, amount=amount, is_group_booking=is_group_booking)
+    booking = Booking(name=name, email=email, phone=phone, address=address, passes=passes, ticket_id=ticket_id, order_id=ticket_id, payment_status='Pending', pass_type=pass_type, amount=amount, is_group_booking=is_group_booking, pricing=pricing)
     # Save to Google Sheet (primary), MongoDB (optional), and JSON (cache)
     booking.save()
 
@@ -218,7 +257,7 @@ def update_booking_status():
             content = EventContent.get_content()
             venue = content.get('venue', 'Kunjachaya, Bhadreswar')
             event_date = content.get('event_date', 'March 3, 2026')
-            booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date, 'payment_status': new_status}
+            booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date, 'payment_status': new_status, 'pricing': content.get('pricing', {})}
             
             email_sent = False
             try:
@@ -382,7 +421,7 @@ def admin_send_mail():
         content = EventContent.get_content()
         venue = content.get('venue', 'Kunjachaya, Bhadreswar')
         event_date = content.get('event_date', 'March 3, 2026')
-        booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date}
+        booking_with_venue = {**booking, 'venue': venue, 'event_date': event_date, 'pricing': content.get('pricing', {})}
         
         if mail_type == 'success':
             try:

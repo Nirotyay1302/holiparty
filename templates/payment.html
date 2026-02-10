@@ -25,6 +25,15 @@
                                 <p><strong>Name:</strong> {{ name }}</p>
                                 <p><strong>Number of Passes:</strong> {{ passes }}</p>
                                 <p><strong>Total Amount:</strong> ₹{{ amount }}</p>
+                                <p><strong>Pass Type:</strong>
+                                    {% if pass_type == 'entry_starter' %}
+                                    Entry + Starter
+                                    {% elif pass_type == 'entry_starter_lunch' %}
+                                    Entry + Starter + Lunch
+                                    {% else %}
+                                    Entry Only
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -70,7 +79,7 @@
                 <!-- Demo Ticket Preview (as per ₹200 criteria) -->
                 <div class="card border-2 border-primary mt-4">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0">📋 Demo Ticket Preview (Sample – ₹200 Entry)</h6>
+                        <h6 class="mb-0">📋 Demo Ticket Preview (Sample)</h6>
                     </div>
                     <div class="card-body">
                         <div class="demo-ticket p-4 rounded"
@@ -83,8 +92,16 @@
                                 <div class="col-6 col-sm-6"><strong>Name:</strong> Sample User</div>
                                 <div class="col-6 col-sm-6"><strong>Ticket ID:</strong> XXXXXXXX</div>
                                 <div class="col-12 mt-2"><strong class="bg-warning px-2 py-1 rounded">Amount Paid:
-                                        ₹200</strong></div>
-                                <div class="col-6 mt-2"><strong>Passes:</strong> 1 | Entry Only</div>
+                                        ₹{{ amount }}</strong></div>
+                                <div class="col-6 mt-2"><strong>Passes:</strong> {{ passes }} |
+                                    {% if pass_type == 'entry_starter' %}
+                                    Entry + Starter
+                                    {% elif pass_type == 'entry_starter_lunch' %}
+                                    Entry + Starter + Lunch
+                                    {% else %}
+                                    Entry Only
+                                    {% endif %}
+                                </div>
                                 <div class="col-6 mt-2"><strong>Venue:</strong> Kunjachaya, Bhadreswar</div>
                                 <div class="col-12 mt-2"><strong>Date:</strong> March 3, 2026 | 10:00 AM - 5:00 PM</div>
                                 <div class="col-12 mt-2 text-center">

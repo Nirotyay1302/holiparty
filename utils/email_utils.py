@@ -45,7 +45,15 @@ def create_success_email_template(booking, event_content):
     # Calculate plan details
     passes = booking.get('passes', 1)
     pass_type = booking.get('pass_type', 'entry')
-    amount = booking.get('amount', passes * entry_pass_price)
+    
+    # Determine fallback price based on pass type
+    fallback_price_per_pass = entry_pass_price
+    if pass_type == 'entry_starter':
+        fallback_price_per_pass = entry_starter_price
+    elif pass_type == 'entry_starter_lunch':
+        fallback_price_per_pass = entry_lunch_price
+        
+    amount = booking.get('amount', passes * fallback_price_per_pass)
     
     # Get event details
     event_date = event_content.get('event_date', 'March 3, 2026')
