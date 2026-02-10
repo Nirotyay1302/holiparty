@@ -30,6 +30,13 @@ def generate_ticket_pdf(booking):
         'entry_starter_lunch': 'Entry + Starter + Lunch'
     }
     pass_label = pass_type_labels.get(booking.get('pass_type', 'entry'), 'Entry Only')
+    if booking.get('is_couple_booking'):
+        pass_label += " (Couple Offer)"
+    elif booking.get('is_group_booking'):
+        if booking.get('passes', 1) >= 8:
+             pass_label += " (Group 15% Off)"
+        else:
+             pass_label += " (Group 10% Off)"
     amount = booking.get('amount')
     if amount is None:
         # Fallback logic if amount is missing

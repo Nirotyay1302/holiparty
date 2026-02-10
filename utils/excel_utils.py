@@ -92,19 +92,21 @@ def upsert_booking_row(booking_dict):
     if worksheet is None:
         return False
     try:
-        headers = ['Name', 'Email', 'Phone', 'Ticket ID', 'Passes', 'Amount', 'Payment Status', 'Entry Status', 'Booking Date', 'Pass Type', 'Transaction ID']
+        headers = ['Name', 'Email', 'Phone', 'Ticket ID', 'Passes', 'Amount', 'Payment Status', 'Entry Status', 'Booking Date', 'Pass Type', 'Transaction ID', 'Discount Info']
         # Ensure header exists
         existing_headers = worksheet.row_values(1)
         existing_headers_stripped = [h.strip() for h in existing_headers] if existing_headers else []
         
-        # Add "Transaction ID" header if missing (column K)
-        if len(existing_headers_stripped) < 11 or existing_headers_stripped[10] != 'Transaction ID':
-            if len(existing_headers_stripped) == 10:
-                # Sheet has 10 headers, add "Transaction ID" as 11th
+        # Add new headers if missing
+        if not existing_headers:
+            worksheet.append_row(headers)
+        else:
+            # Check for Transaction ID (11th)
+            if len(existing_headers_stripped) < 11:
                 worksheet.update_cell(1, 11, 'Transaction ID')
-            elif not existing_headers:
-                # Empty sheet, write all headers
-                worksheet.append_row(headers)
+            # Check for Discount Info (12th)
+            if len(existing_headers_stripped) < 12:
+                worksheet.update_cell(1, 12, 'Discount Info')
 
         ticket_id = (booking_dict.get('ticket_id') or '').strip()
         if not ticket_id:
@@ -122,6 +124,7 @@ def upsert_booking_row(booking_dict):
             booking_dict.get('booking_date', ''),
             booking_dict.get('pass_type', 'entry'),
             booking_dict.get('transaction_id', ''),
+            booking_dict.get('discount_description', ''),
         ]
 
         try:
@@ -136,7 +139,7 @@ def upsert_booking_row(booking_dict):
             row_num = None
 
         if row_num and row_num > 1:
-            worksheet.update(f"A{row_num}:K{row_num}", [row])
+            worksheet.update(f"A{row_num}:L{row_num}", [row])
         else:
             worksheet.append_row(row)
         return True
@@ -155,13 +158,17 @@ def read_bookings_from_google_sheet():
         if len(all_values) < 2:
             return []
         
-            # Column order: Name(0), Email(1), Phone(2), Ticket ID(3), Passes(4), Amount(5), Payment Status(6), Entry Status(7), Booking Date(8), Pass Type(9), Transaction ID(10)
+        # Column order: Name(0), Email(1), Phone(2), Ticket ID(3), Passes(4), Amount(5), 
+        # Payment Status(6), Entry Status(7), Booking Date(8), Pass Type(9), Transaction ID(10), Discount Info(11)
         
         out = []
         for row_data in all_values[1:]:
             if not row_data or (len(row_data) > 0 and not str(row_data[0]).strip()):  # Skip empty rows
                 continue
-            row_data_padded = row_data + [''] * (11 - len(row_data))
+            row_data_padded = row_data + [''] * (12 - len(row_data))
+            
+            # Reconstruct is_couple_booking strictly from discount info if possible, or just rely on discount_description
+            desc = (row_data_padded[11] if len(row_data_padded) > 11 else '').strip()
             
             out.append({
                 'name': (row_data_padded[0] or '').strip(),
@@ -175,6 +182,9 @@ def read_bookings_from_google_sheet():
                 'booking_date': (row_data_padded[8] or '').strip(),
                 'pass_type': ((row_data_padded[9] if len(row_data_padded) > 9 else '') or 'entry').strip() or 'entry',
                 'transaction_id': ((row_data_padded[10] if len(row_data_padded) > 10 else '') or '').strip(),
+                'discount_description': desc,
+                'is_couple_booking': 'Couple' in desc, # simple inference
+                'is_group_booking': 'Group' in desc or (int(row_data_padded[4] or 0) >= 5)
             })
         return out
     except Exception as e:

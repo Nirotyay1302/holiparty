@@ -256,6 +256,7 @@ def create_success_email_template(booking, event_content):
             </div>
             
             <div class="amount-box">
+                {f"<div style='font-size: 16px; margin-bottom: 5px; opacity: 0.9;'>{booking.get('discount_description')} Applied!</div>" if booking.get('discount_description') else ""}
                 Total Amount Paid: ₹{amount}
             </div>
             

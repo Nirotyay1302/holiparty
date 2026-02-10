@@ -204,24 +204,24 @@
             style="background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold; font-size: clamp(2.5rem, 5vw, 4rem);">
             Book Your Tickets</h2>
 
-        <!-- Group Booking Offer - Prominent Highlight -->
         <div class="group-offer-banner mb-5">
             <div class="group-offer-inner">
                 <div class="row align-items-center g-4">
                     <div class="col-12 col-lg-2 text-center order-2 order-lg-1">
-                        <span class="group-offer-icon">👥</span>
-                        <h3 class="group-offer-percent mb-0">10%</h3>
+                        <span class="group-offer-icon">🎉</span>
+                        <h3 class="group-offer-percent mb-0">15%</h3>
                         <small class="text-white-50">OFF</small>
                     </div>
                     <div class="col-12 col-lg-7 order-1 order-lg-2">
-                        <h4 class="mb-2">🎉 Group Booking Special Offer</h4>
-                        <p class="mb-0 mb-lg-0">Book <strong>5 or more passes</strong> and get <strong>10%
-                                discount</strong> on your total bill! Perfect for friends, families, and colleagues. The
-                            more you book, the more you save. Apply coupon automatically at checkout when you select 5+
-                            passes.</p>
+                        <h4 class="mb-2">Special Offers!</h4>
+                        <ul class="mb-0 list-unstyled text-white">
+                            <li>🔥 <strong>Group Booking (8+):</strong> Get <strong>15% OFF</strong>!</li>
+                            <li>👥 <strong>Group Booking (5-7):</strong> Get <strong>10% OFF</strong>!</li>
+                            <li>❤️ <strong>Lovebird/Couple (2):</strong> Get <strong>10% OFF</strong>!</li>
+                        </ul>
                     </div>
                     <div class="col-12 col-lg-3 text-center text-lg-end order-3">
-                        <span class="badge bg-light text-dark fs-6 px-3 py-2">5+ Members = 10% Off</span>
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2">Select passes to apply!</span>
                     </div>
                 </div>
             </div>
@@ -237,6 +237,7 @@
                         <form id="bookingForm" action="/create_order" method="POST">
                             <input type="hidden" id="pass_type" name="pass_type" value="entry">
                             <input type="hidden" id="amount" name="amount" value="{{ content.pricing.entry_pass }}">
+                            <input type="hidden" id="is_couple_booking" name="is_couple_booking" value="false">
                             <div class="mb-4">
                                 <label for="name" class="form-label">Full Name *</label>
                                 <input type="text" class="form-control" id="name" name="name"
@@ -319,9 +320,26 @@
                                     <option value="8">8 Passes</option>
                                     <option value="9">9 Passes</option>
                                     <option value="10">10 Passes</option>
+                                    <option value="11">11 Passes</option>
+                                    <option value="12">12 Passes</option>
+                                    <option value="13">13 Passes</option>
+                                    <option value="14">14 Passes</option>
+                                    <option value="15">15 Passes</option>
+                                    <option value="16">16 Passes</option>
+                                    <option value="17">17 Passes</option>
+                                    <option value="18">18 Passes</option>
+                                    <option value="19">19 Passes</option>
+                                    <option value="20">20 Passes</option>
                                 </select>
-                                <div class="form-text" id="groupDiscountText" style="display: none;">🎉 <strong>Group
-                                        booking!</strong> 10% discount applied for 5+ members</div>
+
+                                <div class="form-check mt-3" id="coupleDiscountContainer" style="display: none;">
+                                    <input class="form-check-input" type="checkbox" id="coupleDiscountCheck">
+                                    <label class="form-check-label fw-bold text-danger" for="coupleDiscountCheck">
+                                        ❤️ Apply Couple/Lovebird Discount (10% Off)
+                                    </label>
+                                </div>
+
+                                <div class="form-text mt-2" id="groupDiscountText" style="display: none;"></div>
                             </div>
                             <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn"
                                 style="background: linear-gradient(45deg, #ff2f92, #ffd400); border: none;">
@@ -346,7 +364,8 @@
                                 <span id="passTypeLabel">Entry Only</span>
                             </p>
                             <p class="mb-0 mt-1">Subtotal: ₹<span id="subtotal">{{ content.pricing.entry_pass }}</span>
-                                <span id="discountLine" style="display: none;">– 10% group discount</span>
+                                <span id="discountLine"
+                                    style="display: none; color: #28a745; font-weight: bold;"></span>
                             </p>
                             <p class="mb-0"><strong style="color: #ff2f92; font-size: 1.2em;">Total: ₹<span
                                         id="total">{{ content.pricing.entry_pass }}</span></strong></p>
@@ -407,19 +426,65 @@
         const pricePerPerson = parseInt(selectedRadio.getAttribute('data-price')) || 200;
 
         let subtotal = passes * pricePerPerson;
-        const isGroup = passes >= 5;
-        const discount = isGroup ? Math.round(subtotal * 0.1) : 0;
+        let discount = 0;
+        let discountText = '';
+        let isGroup = false;
+        let isCouple = false;
+
+        // Handle Couple Discount Checkbox Visibility
+        const coupleContainer = document.getElementById('coupleDiscountContainer');
+        const coupleCheck = document.getElementById('coupleDiscountCheck');
+
+        if (passes === 2) {
+            coupleContainer.style.display = 'block';
+            if (coupleCheck.checked) {
+                isCouple = true;
+            }
+        } else {
+            coupleContainer.style.display = 'none';
+            coupleCheck.checked = false; // Reset if not 2 passes
+        }
+
+        // Calculate Discount
+        if (passes >= 8) {
+            discount = Math.round(subtotal * 0.15);
+            discountText = '– 15% Group Discount (8+ Tix)';
+            document.getElementById('groupDiscountText').innerHTML = '🎉 <strong>Mega Group Offer!</strong> 15% discount applied for 8+ members';
+            document.getElementById('groupDiscountText').style.display = 'block';
+            isGroup = true;
+        } else if (passes >= 5) {
+            discount = Math.round(subtotal * 0.10);
+            discountText = '– 10% Group Discount (5+ Tix)';
+            document.getElementById('groupDiscountText').innerHTML = '🎉 <strong>Group Offer!</strong> 10% discount applied for 5+ members';
+            document.getElementById('groupDiscountText').style.display = 'block';
+            isGroup = true;
+        } else if (isCouple) {
+            discount = Math.round(subtotal * 0.10);
+            discountText = '– 10% Couple Discount ❤️';
+            document.getElementById('groupDiscountText').style.display = 'none';
+        } else {
+            document.getElementById('groupDiscountText').style.display = 'none';
+        }
+
         const total = subtotal - discount;
 
         document.getElementById('pass_type').value = passType;
         document.getElementById('amount').value = total;
+        document.getElementById('is_couple_booking').value = isCouple ? 'true' : 'false';
+
         document.getElementById('subtotal').textContent = subtotal;
         document.getElementById('total').textContent = total;
         document.getElementById('buttonTotal').textContent = total;
         document.getElementById('selectedPasses').textContent = passes;
         document.getElementById('passTypeLabel').textContent = PASS_LABELS[passType] || 'Entry Only';
-        document.getElementById('groupDiscountText').style.display = isGroup ? 'block' : 'none';
-        document.getElementById('discountLine').style.display = isGroup ? 'inline' : 'none';
+
+        const discountLine = document.getElementById('discountLine');
+        if (discount > 0) {
+            discountLine.textContent = discountText;
+            discountLine.style.display = 'inline';
+        } else {
+            discountLine.style.display = 'none';
+        }
 
         // Highlight selected option
         document.querySelectorAll('.pass-option').forEach(opt => {
@@ -437,6 +502,7 @@
         });
 
         document.getElementById('passes').addEventListener('change', updateBookingTotal);
+        document.getElementById('coupleDiscountCheck').addEventListener('change', updateBookingTotal);
 
         // Initial calculation
         updateBookingTotal();

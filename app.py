@@ -161,6 +161,7 @@ def create_order():
     passes = int(request.form['passes'])
     # Prefer radio button value (directly from user selection) over hidden field (JS updated)
     pass_type = request.form.get('pass_type_radio') or request.form.get('pass_type', 'entry')
+    is_couple_booking = request.form.get('is_couple_booking') == 'true'
     
     # Calculate amount server-side (do not trust client)
     content = EventContent.get_content()
@@ -177,17 +178,43 @@ def create_order():
     base_amount = passes * price_per_pass
     is_group_booking = passes >= 5
     
-    # Apply group discount (10%)
+    # discount logic
     discount = 0
-    if is_group_booking:
-        discount = int(base_amount * 0.1)
+    discount_description = ""
+    
+    if passes >= 8:
+        discount = int(base_amount * 0.15) # 15% off for 8+ passes
+        is_group_booking = True
+        discount_description = "15% Group Discount (8+ people)"
+    elif passes >= 5:
+        discount = int(base_amount * 0.10) # 10% off for 5-7 passes
+        is_group_booking = True
+        discount_description = "10% Group Discount (5+ people)"
+    elif passes == 2 and is_couple_booking:
+        discount = int(base_amount * 0.10) # 10% off for couples
+        discount_description = "10% Couple Discount"
         
     amount = base_amount - discount
 
     print(f"Booking: {name}, {email}, {phone}, {address}, {passes} passes, {pass_type}, amount {amount}")
 
     ticket_id = str(uuid.uuid4())[:8].upper()
-    booking = Booking(name=name, email=email, phone=phone, address=address, passes=passes, ticket_id=ticket_id, order_id=ticket_id, payment_status='Pending', pass_type=pass_type, amount=amount, is_group_booking=is_group_booking, pricing=pricing)
+    booking = Booking(
+        name=name, 
+        email=email, 
+        phone=phone, 
+        address=address, 
+        passes=passes, 
+        ticket_id=ticket_id, 
+        order_id=ticket_id, 
+        payment_status='Pending', 
+        pass_type=pass_type, 
+        amount=amount, 
+        is_group_booking=is_group_booking, 
+        is_couple_booking=(passes == 2 and is_couple_booking),
+        pricing=pricing,
+        discount_description=discount_description
+    )
     # Save to Google Sheet (primary), MongoDB (optional), and JSON (cache)
     booking.save()
 
@@ -513,9 +540,10 @@ def export_bookings():
             'Booking Date': bdate,
             'Pass Type': booking.get('pass_type', 'entry'),
             'Transaction ID': booking.get('transaction_id', ''),
+            'Discount Info': booking.get('discount_description', ''),
         })
 
-    rows = [[r['Name'], r['Email'], r['Phone'], r['Ticket ID'], r['Passes'], r['Amount'], r['Payment Status'], r['Entry Status'], str(r['Booking Date']), r['Pass Type'], r['Transaction ID']] for r in data]
+    rows = [[r['Name'], r['Email'], r['Phone'], r['Ticket ID'], r['Passes'], r['Amount'], r['Payment Status'], r['Entry Status'], str(r['Booking Date']), r['Pass Type'], r['Transaction ID'], r['Discount Info']] for r in data]
     export_to_google_sheets(rows)
 
     df = pd.DataFrame(data)
