@@ -7,319 +7,353 @@
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold text-white mb-4">Get In Touch</h1>
-                <p class="lead text-white-50 mb-4">We'd love to hear from you! Whether you have questions about the event, need assistance with bookings, or just want to share your excitement, our team is here to help.</p>
+                <p class="lead text-white-50 mb-4">We'd love to hear from you! Whether you have questions about the
+                    event, need assistance with bookings, or just want to share your excitement, our team is here to
+                    help.</p>
                 <div class="contact-stats">
                     <div class="stat-item">
                         <div class="stat-number">24/7</div>
                         <div class="stat-text">Support Available</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">< 2hrs</div>
-                        <div class="stat-text">Response Time</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-text">Satisfaction</div>
+                        <div class="stat-number">
+                            < 2hrs</div>
+                                <div class="stat-text">Response Time</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-text">Satisfaction</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="hero-visual">
-                    <div class="contact-icon-large">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <div class="floating-bubbles">
-                        <div class="bubble">📧</div>
-                        <div class="bubble">📱</div>
-                        <div class="bubble">💬</div>
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="contact-icon-large">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="floating-bubbles">
+                            <div class="bubble">📧</div>
+                            <div class="bubble">📱</div>
+                            <div class="bubble">💬</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </section>
 
 <style>
-.contact-hero-section {
-    position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    padding: 4rem 0;
-    border-radius: 0 0 50px 50px;
-    overflow: hidden;
-}
-
-.contact-hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&h=1080&fit=crop') center/cover no-repeat;
-    opacity: 0.3;
-    z-index: 1;
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 2;
-}
-
-.contact-hero-section .container {
-    position: relative;
-    z-index: 3;
-}
-
-.contact-stats {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-}
-
-.stat-item {
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 1rem;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.3);
-    min-width: 120px;
-}
-
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #ffd400;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.stat-text {
-    color: white;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.hero-visual {
-    position: relative;
-    text-align: center;
-}
-
-.contact-icon-large {
-    font-size: 8rem;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 2rem;
-}
-
-.floating-bubbles {
-    position: absolute;
-    top: -20px;
-    right: -20px;
-}
-
-.bubble {
-    display: inline-block;
-    background: white;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin: 5px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    animation: bubbleFloat 4s ease-in-out infinite;
-}
-
-.bubble:nth-child(2) { animation-delay: 1s; }
-.bubble:nth-child(3) { animation-delay: 2s; }
-
-@keyframes bubbleFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(5deg); }
-}
-
-.section-title {
-    background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: bold;
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    margin-bottom: 1rem;
-}
-
-.quick-contact-card {
-    background: white;
-    padding: 2rem 1.5rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 2px solid transparent;
-    height: 100%;
-}
-
-.quick-contact-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    border-color: #ff2f92;
-}
-
-.contact-icon-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.contact-info-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 2rem;
-}
-
-.contact-icon-wrapper {
-    background: linear-gradient(45deg, #ff2f92, #ffd400);
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.social-links {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.social-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.social-link.facebook { background: #1877f2; color: white; }
-.social-link.instagram { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; }
-.social-link.twitter { background: #1da1f2; color: white; }
-.social-link.youtube { background: #ff0000; color: white; }
-.social-link.whatsapp { background: #25d366; color: white; }
-
-.social-link:hover {
-    transform: translateY(-5px) scale(1.1);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-.contact-form-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.form-header {
-    border-bottom: 2px solid #f8f9fa;
-    padding-bottom: 1rem;
-    margin-bottom: 2rem;
-}
-
-.input-group-text {
-    background: linear-gradient(45deg, #ff2f92, #ffd400);
-    color: white;
-    border: none;
-}
-
-.map-container {
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.accordion-item {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 10px !important;
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.accordion-button {
-    background: white;
-    color: #333;
-    font-weight: 600;
-    padding: 1.5rem;
-    border: none;
-    box-shadow: none;
-}
-
-.accordion-button:not(.collapsed) {
-    background: linear-gradient(45deg, #ff2f92, #ffd400);
-    color: white;
-}
-
-.accordion-body {
-    padding: 1.5rem;
-    background: #f8f9fa;
-}
-
-@media (max-width: 768px) {
     .contact-hero-section {
-        text-align: center;
-        padding: 2rem 0;
+        position: relative;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        padding: 4rem 0;
+        border-radius: 0 0 50px 50px;
+        overflow: hidden;
+    }
+
+    .contact-hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&h=1080&fit=crop') center/cover no-repeat;
+        opacity: 0.3;
+        z-index: 1;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2;
+    }
+
+    .contact-hero-section .container {
+        position: relative;
+        z-index: 3;
     }
 
     .contact-stats {
-        justify-content: center;
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
     }
 
     .stat-item {
-        min-width: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        min-width: 120px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ffd400;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-text {
+        color: white;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     .hero-visual {
-        display: none;
+        position: relative;
+        text-align: center;
     }
 
-    .quick-contact-card {
-        margin-bottom: 1rem;
-    }
-
-    .contact-info-card {
-        position: static;
+    .contact-icon-large {
+        font-size: 8rem;
+        color: rgba(255, 255, 255, 0.8);
         margin-bottom: 2rem;
     }
 
     .floating-bubbles {
-        display: none;
+        position: absolute;
+        top: -20px;
+        right: -20px;
     }
-}
+
+    .bubble {
+        display: inline-block;
+        background: white;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        animation: bubbleFloat 4s ease-in-out infinite;
+    }
+
+    .bubble:nth-child(2) {
+        animation-delay: 1s;
+    }
+
+    .bubble:nth-child(3) {
+        animation-delay: 2s;
+    }
+
+    @keyframes bubbleFloat {
+
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-15px) rotate(5deg);
+        }
+    }
+
+    .section-title {
+        background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        margin-bottom: 1rem;
+    }
+
+    .quick-contact-card {
+        background: white;
+        padding: 2rem 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+
+    .quick-contact-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-color: #ff2f92;
+    }
+
+    .contact-icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .contact-info-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 2rem;
+    }
+
+    .contact-icon-wrapper {
+        background: linear-gradient(45deg, #ff2f92, #ffd400);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .social-link.facebook {
+        background: #1877f2;
+        color: white;
+    }
+
+    .social-link.instagram {
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        color: white;
+    }
+
+    .social-link.twitter {
+        background: #1da1f2;
+        color: white;
+    }
+
+    .social-link.youtube {
+        background: #ff0000;
+        color: white;
+    }
+
+    .social-link.whatsapp {
+        background: #25d366;
+        color: white;
+    }
+
+    .social-link:hover {
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-form-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+        border-bottom: 2px solid #f8f9fa;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .input-group-text {
+        background: linear-gradient(45deg, #ff2f92, #ffd400);
+        color: white;
+        border: none;
+    }
+
+    .map-container {
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .accordion-item {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 10px !important;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .accordion-button {
+        background: white;
+        color: #333;
+        font-weight: 600;
+        padding: 1.5rem;
+        border: none;
+        box-shadow: none;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(45deg, #ff2f92, #ffd400);
+        color: white;
+    }
+
+    .accordion-body {
+        padding: 1.5rem;
+        background: #f8f9fa;
+    }
+
+    @media (max-width: 768px) {
+        .contact-hero-section {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .contact-stats {
+            justify-content: center;
+        }
+
+        .stat-item {
+            min-width: 100px;
+        }
+
+        .hero-visual {
+            display: none;
+        }
+
+        .quick-contact-card {
+            margin-bottom: 1rem;
+        }
+
+        .contact-info-card {
+            position: static;
+            margin-bottom: 2rem;
+        }
+
+        .floating-bubbles {
+            display: none;
+        }
+    }
 </style>
 
 
@@ -438,13 +472,18 @@
                     <div class="mt-5">
                         <h6 class="mb-3">Follow Us</h6>
                         <div class="social-links">
-                            <a href="https://www.facebook.com/share/1DUfCTvKxa/" target="_blank" rel="noopener noreferrer" class="social-link facebook" title="Spectra Events on Facebook">
+                            <a href="https://www.facebook.com/share/1DUfCTvKxa/" target="_blank"
+                                rel="noopener noreferrer" class="social-link facebook"
+                                title="Spectra Events on Facebook">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="https://www.instagram.com/spectra_events_a?igsh=MWRybXRvN3VoaG92eg==" target="_blank" rel="noopener noreferrer" class="social-link instagram" title="Instagram @SPECTRA_EVENTS_A">
+                            <a href="https://www.instagram.com/spectra_events_a?igsh=MWRybXRvN3VoaG92eg=="
+                                target="_blank" rel="noopener noreferrer" class="social-link instagram"
+                                title="Instagram @SPECTRA_EVENTS_A">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="https://wa.me/917278737263" target="_blank" rel="noopener noreferrer" class="social-link whatsapp" title="Contact us on WhatsApp">
+                            <a href="https://wa.me/917278737263" target="_blank" rel="noopener noreferrer"
+                                class="social-link whatsapp" title="Contact us on WhatsApp">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                         </div>
@@ -457,14 +496,19 @@
                 <div class="contact-form-card">
                     <div class="form-header">
                         <h3 class="mb-3">Send us a Message</h3>
-                        <p class="text-muted mb-0">DM us directly on our Instagram handle. We respond within 2 hours!</p>
+                        <p class="text-muted mb-0">DM us directly on our Instagram handle. We respond within 2 hours!
+                        </p>
                     </div>
                     <div class="text-center py-4">
                         <p class="mb-4">Scan the QR code or click the link below to message us on Instagram.</p>
-                        <a href="https://www.instagram.com/spectra_events_a?igsh=MWRybXRvN3VoaG92eg==" target="_blank" rel="noopener noreferrer" class="d-inline-block text-decoration-none">
-                            <img src="{{ url_for('static', filename='images/instagram-qr.png') }}" alt="Instagram @SPECTRA_EVENTS_A" class="img-fluid rounded shadow" style="max-width: 220px;">
+                        <a href="https://www.instagram.com/spectra_events_a?igsh=MWRybXRvN3VoaG92eg==" target="_blank"
+                            rel="noopener noreferrer" class="d-inline-block text-decoration-none">
+                            <img src="{{ url_for('static', filename='images/instagram-qr.png') }}"
+                                alt="Instagram @SPECTRA_EVENTS_A" class="img-fluid rounded shadow"
+                                style="max-width: 220px;">
                             <p class="mt-3 fw-bold text-primary mb-0">@SPECTRA_EVENTS_A</p>
-                            <span class="btn btn-primary mt-2"><i class="fab fa-instagram me-2"></i>Message us on Instagram</span>
+                            <span class="btn btn-primary mt-2"><i class="fab fa-instagram me-2"></i>Message us on
+                                Instagram</span>
                         </a>
                     </div>
                 </div>
@@ -480,21 +524,17 @@
             <div class="col-12">
                 <div class="text-center mb-4">
                     <h2 class="section-title">Find Our Location</h2>
-                    <p class="lead text-muted">Maliapara Bridgedhar, Bhadreswar – Near Bighati More (from Delhi Road)</p>
+                    <p class="lead text-muted">Kunjachaya, Bhadreswar</p>
                 </div>
                 <div class="map-container rounded shadow overflow-hidden">
                     <iframe
-                        src="https://maps.google.com/maps?q=Maliapara+Bridgedhar+Bhadreswar&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                        width="100%"
-                        height="450"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="Maliapara Bridgedhar, Bhadreswar - Near Bighati More - Event Venue">
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3677.2391235673176!2d88.31909637566223!3d22.83064097930881!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f88f00762815bf%3A0x629b02ddd9364252!2sKunjachaya!5e0!3m2!1sen!2sin!4v1770747627807!5m2!1sen!2sin"
+                        width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade" title="Kunjachaya - Event Venue">
                     </iframe>
                     <div class="map-overlay-link">
-                        <a href="https://www.google.com/maps/search/Maliapara+Bridgedhar+Bhadreswar" target="_blank" rel="noopener" class="btn btn-sm btn-light shadow">
+                        <a href="https://maps.app.goo.gl/dyjsbhJPtLQs7DR49" target="_blank" rel="noopener"
+                            class="btn btn-sm btn-light shadow">
                             <i class="fas fa-external-link-alt me-1"></i>Open in Google Maps
                         </a>
                     </div>
@@ -516,37 +556,43 @@
                 <div class="accordion" id="contactFaq">
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq1">
                                 How quickly will I get a response?
                             </button>
                         </h2>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#contactFaq">
                             <div class="accordion-body">
-                                We typically respond within 2 hours during business hours (9 AM - 9 PM IST). For urgent matters, please call our contact numbers listed above.
+                                We typically respond within 2 hours during business hours (9 AM - 9 PM IST). For urgent
+                                matters, please call our contact numbers listed above.
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq2">
                                 Can I call you directly?
                             </button>
                         </h2>
                         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
                             <div class="accordion-body">
-                                Yes! Our contact persons are available by phone during business hours. For best results, please use the contact form first or send an email.
+                                Yes! Our contact persons are available by phone during business hours. For best results,
+                                please use the contact form first or send an email.
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#faq3">
                                 Do you have WhatsApp support?
                             </button>
                         </h2>
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
                             <div class="accordion-body">
-                                Yes, you can reach us on WhatsApp for quick queries and support. Click the WhatsApp icon in our social links to start a conversation.
+                                Yes, you can reach us on WhatsApp for quick queries and support. Click the WhatsApp icon
+                                in our social links to start a conversation.
                             </div>
                         </div>
                     </div>
