@@ -159,7 +159,8 @@ def create_order():
     phone = request.form['phone']
     address = request.form['address']
     passes = int(request.form['passes'])
-    pass_type = request.form.get('pass_type', 'entry')
+    # Prefer radio button value (directly from user selection) over hidden field (JS updated)
+    pass_type = request.form.get('pass_type_radio') or request.form.get('pass_type', 'entry')
     
     # Calculate amount server-side (do not trust client)
     content = EventContent.get_content()
