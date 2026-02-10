@@ -9,15 +9,14 @@ A complete web application for promoting and managing bookings for Spectra HoliP
 - **Couples**: 10% discount | **Groups**: 10% off (5+ members), 15% off (8+ members)
 - Razorpay + **UPI/QR payment** (7278737263@jio)
 - Automatic email tickets with name, Ticket ID, amount highlighted
-- Auto-updating [Google Sheets](https://docs.google.com/spreadsheets/d/13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew) for bookings
-- MongoDB database for records
+- Auto-updating [Google Sheets] for bookings
+
 
 ## Setup Instructions
 
 ### Prerequisites
 - Python 3.8+
 - MongoDB Atlas account
-- Resend account (for emails) - [resend.com](https://resend.com)
 - Google Cloud account for Sheets API
 
 ### Local Development
@@ -52,18 +51,12 @@ A complete web application for promoting and managing bookings for Spectra HoliP
    - Download the JSON credentials file and place it in the project root as `creds.json`.
    - Share the Google Sheet with the service account email.
 
-6. For Resend Email:
-   - Sign up at [resend.com](https://resend.com) (free tier: 3,000 emails/month)
-   - Get API key from [resend.com/api-keys](https://resend.com/api-keys)
-   - For testing: Use `onboarding@resend.dev` (works immediately)
-   - For production: Verify your domain (see RESEND_SETUP.md for details)
-
-7. Run the application:
+6. Run the application:
    ```
    python app.py
    ```
 
-8. Open http://localhost:5000 in your browser.
+7. Open http://localhost:5000 in your browser.
 
 ### Hosting
 
@@ -84,12 +77,6 @@ A complete web application for promoting and managing bookings for Spectra HoliP
 #### Payment (Razorpay)
 - Sign up for Razorpay.
 - Get API keys and set in environment.
-
-#### Email (Resend API)
-- Sign up at [resend.com](https://resend.com)
-- Get API key and set RESEND_API_KEY
-- Set RESEND_FROM_EMAIL (use `onboarding@resend.dev` for testing)
-- See RESEND_SETUP.md for detailed setup guide
 
 #### Excel Update (Google Sheets)
 - As described in setup.
