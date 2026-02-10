@@ -39,8 +39,8 @@ def create_success_email_template(booking, event_content):
     # Get pricing details
     pricing = event_content.get('pricing', {})
     entry_pass_price = pricing.get('entry_pass', 200)
-    entry_starter_price = pricing.get('entry_plus_starter', 349)
-    entry_lunch_price = pricing.get('entry_plus_starter_lunch', 499)
+    entry_starter_price = pricing.get('entry_plus_starter', 350)
+    entry_lunch_price = pricing.get('entry_plus_starter_lunch', 500)
     
     # Calculate plan details
     passes = booking.get('passes', 1)

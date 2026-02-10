@@ -133,8 +133,8 @@ def admin():
                 p_type = b.get('pass_type', 'entry')
                 price = 200
                 if p_type == 'entry': price = pricing.get('entry_pass', 200)
-                elif p_type == 'entry_starter': price = pricing.get('entry_plus_starter', 349)
-                elif p_type == 'entry_starter_lunch': price = pricing.get('entry_plus_starter_lunch', 499)
+                elif p_type == 'entry_starter': price = pricing.get('entry_plus_starter', 350)
+                elif p_type == 'entry_starter_lunch': price = pricing.get('entry_plus_starter_lunch', 500)
                 total_revenue += b.get('passes', 1) * price
 
     return render_template('admin.html', bookings=bookings, total_revenue=total_revenue, content=content)
@@ -171,9 +171,9 @@ def create_order():
     if pass_type == 'entry':
         price_per_pass = pricing.get('entry_pass', 200)
     elif pass_type == 'entry_starter':
-        price_per_pass = pricing.get('entry_plus_starter', 349)
+        price_per_pass = pricing.get('entry_plus_starter', 350)
     elif pass_type == 'entry_starter_lunch':
-        price_per_pass = pricing.get('entry_plus_starter_lunch', 499)
+        price_per_pass = pricing.get('entry_plus_starter_lunch', 500)
         
     base_amount = passes * price_per_pass
     is_group_booking = passes >= 5
@@ -344,7 +344,7 @@ def admin_content():
             'pricing': {
                 'entry_pass': int(request.form['entry_pass']),
                 'entry_plus_starter': int(request.form['entry_plus_starter']),
-                'entry_plus_starter_lunch': int(request.form.get('entry_plus_starter_lunch', 499)),
+                'entry_plus_starter_lunch': int(request.form.get('entry_plus_starter_lunch', 500)),
                 'food_available': request.form['food_available']
             },
             'offers': request.form['offers'],

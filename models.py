@@ -140,8 +140,8 @@ class EventContent:
         ],
         'pricing': {
             'entry_pass': 200,
-            'entry_plus_starter': 349,
-            'entry_plus_starter_lunch': 499,
+            'entry_plus_starter': 350,
+            'entry_plus_starter_lunch': 500,
             'food_available': 'Food & drink available at counter'
         },
         'complimentary': 'Abir & Special Lassi',

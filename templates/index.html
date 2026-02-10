@@ -297,10 +297,10 @@
                                             data-type="entry_starter_lunch">
                                             <input class="form-check-input" type="radio" name="pass_type_radio"
                                                 id="passLunch" value="entry_starter_lunch"
-                                                data-price="{{ content.pricing.get('entry_plus_starter_lunch', 499) }}">
+                                                data-price="{{ content.pricing.get('entry_plus_starter_lunch', 500) }}">
                                             <label class="form-check-label w-100" for="passLunch">
                                                 <strong>Entry + Starter + Lunch</strong> – ₹{{
-                                                content.pricing.get('entry_plus_starter_lunch', 499) }}/person<br>
+                                                content.pricing.get('entry_plus_starter_lunch', 500) }}/person<br>
                                                 <small class="text-muted">All benefits + Full lunch included</small>
                                             </label>
                                         </div>
@@ -359,7 +359,7 @@
                             <h5>🎫 Pass Options</h5>
                             <p class="mb-1 small">Entry: ₹{{ content.pricing.entry_pass }} | Entry+Starter: ₹{{
                                 content.pricing.entry_plus_starter }} | Entry+Starter+Lunch: ₹{{
-                                content.pricing.get('entry_plus_starter_lunch', 499) }}</p>
+                                content.pricing.get('entry_plus_starter_lunch', 500) }}</p>
                             <p class="mb-0">Selected: <strong><span id="selectedPasses">1</span> pass(es)</strong> –
                                 <span id="passTypeLabel">Entry Only</span>
                             </p>

@@ -46,9 +46,9 @@ def generate_ticket_pdf(booking):
         if pass_type == 'entry':
             price_per_pass = pricing.get('entry_pass', 200)
         elif pass_type == 'entry_starter':
-            price_per_pass = pricing.get('entry_plus_starter', 349)
+            price_per_pass = pricing.get('entry_plus_starter', 350)
         elif pass_type == 'entry_starter_lunch':
-            price_per_pass = pricing.get('entry_plus_starter_lunch', 499)
+            price_per_pass = pricing.get('entry_plus_starter_lunch', 500)
         amount = booking.get('passes', 1) * price_per_pass
     venue = booking.get('venue', 'Kunjachaya, Bhadreswar')
 

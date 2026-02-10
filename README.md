@@ -5,8 +5,8 @@ A complete web application for promoting and managing bookings for Spectra HoliP
 ## Features
 
 - Event promotion page with Previous Year Photos
-- Online booking with **3 pass types**: Entry (₹200), Entry+Starter (₹349), Entry+Starter+Lunch (₹499)
-- **Group booking**: 10% discount for 5+ members
+- Online booking with **3 pass types**: Entry (₹200), Entry+Starter (₹350), Entry+Starter+Lunch (₹500)
+- **Couples**: 10% discount | **Groups**: 10% off (5+ members), 15% off (8+ members)
 - Razorpay + **UPI/QR payment** (7278737263@jio)
 - Automatic email tickets with name, Ticket ID, amount highlighted
 - Auto-updating [Google Sheets](https://docs.google.com/spreadsheets/d/13oh5EqMrsnNOqCGqKzDNzHgy4p9gRGXz6JDVK7XyKew) for bookings
