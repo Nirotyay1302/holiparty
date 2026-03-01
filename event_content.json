@@ -1,0 +1,33 @@
+{
+  "event_date": "March 3, 2026",
+  "event_time": "10:00 AM \u2013 5:00 PM",
+  "venue": "Kunjachaya, Bhadreswar",
+  "organizer": "Spectra Group",
+  "contact_persons": [
+    {
+      "name": "Nirotyay Mukherjee",
+      "phone": "7278737263"
+    },
+    {
+      "name": "Anirban Sarkar",
+      "phone": "7439153943"
+    }
+  ],
+  "pricing": {
+    "entry_pass": 200,
+    "entry_plus_starter": 350,
+    "entry_plus_starter_lunch": 499,
+    "food_available": "Veg and Non-Veg options available at counters"
+  },
+  "registration_deadline": "March 2, 2026 12:00:00",
+  "complimentary": "Abir & Special Lassi",
+  "offers": "",
+  "hero_image": "static/images/holi-hero.jpg",
+  "gallery_images": [
+    "images/image 1.jpeg",
+    "https://images.unsplash.com/photo-1576018617798-17d3969b8781?w=800&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1583163093287-1a0d5459bdce?w=800&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1615723795498-a89ca47339c7?w=800&h=600&fit=crop"
+  ]
+}
