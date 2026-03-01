@@ -130,7 +130,7 @@ class EventContent:
     
     DEFAULT_CONTENT = {
         'event_date': 'March 3, 2026',
-        'registration_deadline': 'February 28, 2026',
+        'registration_deadline': 'March 2, 2026 12:00:00',
         'event_time': '10:00 AM – 5:00 PM',
         'venue': 'Kunjachaya, Bhadreswar',
         'organizer': 'Spectra Group',

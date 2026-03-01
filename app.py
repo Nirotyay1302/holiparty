@@ -178,23 +178,25 @@ def create_order():
     base_amount = passes * price_per_pass
     is_group_booking = passes >= 5
     
-    # discount logic
-    discount = 0
+    # Server-side Deadline Check
+    registration_deadline_str = content.get('registration_deadline', 'March 2, 2026 12:00:00')
+    try:
+        deadline = datetime.strptime(registration_deadline_str, '%B %d, %Y %H:%M:%S')
+    except ValueError:
+        # Fallback for if format is different (e.g. from admin panel)
+        try:
+            deadline = datetime.strptime(registration_deadline_str, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            deadline = datetime(2026, 3, 2, 12, 0, 0)
+            
+    if datetime.now() > deadline:
+        print(f"Booking attempted after deadline: {datetime.now()} > {deadline}")
+        flash('Registration has closed! The deadline was March 2nd, 12:00 PM.', 'error')
+        return redirect(url_for('home') + '#booking')
+
+    amount = base_amount # No more discounts
     discount_description = ""
-    
-    if passes >= 8:
-        discount = int(base_amount * 0.15) # 15% off for 8+ passes
-        is_group_booking = True
-        discount_description = "15% Group Discount (8+ people)"
-    elif passes >= 5:
-        discount = int(base_amount * 0.10) # 10% off for 5-7 passes
-        is_group_booking = True
-        discount_description = "10% Group Discount (5+ people)"
-    elif passes == 2 and is_couple_booking:
-        discount = int(base_amount * 0.10) # 10% off for couples
-        discount_description = "10% Couple Discount"
-        
-    amount = base_amount - discount
+    is_group_booking = False # Not relevant anymore with no discounts
 
     print(f"Booking: {name}, {email}, {phone}, {address}, {passes} passes, {pass_type}, amount {amount}")
 
@@ -336,7 +338,7 @@ def admin_content():
         gallery_images = [x.strip() for x in request.form.getlist('gallery_images[]') if str(x).strip()]
         content = {
             'event_date': request.form['event_date'],
-            'registration_deadline': request.form.get('registration_deadline', 'February 28, 2026'),
+            'registration_deadline': request.form.get('registration_deadline', 'March 2, 2026 12:00:00'),
             'event_time': request.form['event_time'],
             'venue': request.form['venue'],
             'organizer': request.form['organizer'],

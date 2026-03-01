@@ -27,12 +27,13 @@
             bring everyone together in joy and harmony.</p>
         <div class="alert alert-danger border-3 mb-4 py-3 px-4 text-center"
             style="background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%); border-color: #dc3545 !important;">
-            <strong class="fs-5">📅 Last Date of Registration: {{ content.get('registration_deadline', 'February 28,
-                2026') }}</strong>
-            <p class="mb-0 mt-2 small">Register before the countdown ends!</p>
+            <strong class="fs-5">📅 LAST REGISTRATION CALL: {{ content.get('registration_deadline', 'March 2, 2026
+                12:00:00') }}</strong>
+            <p class="mb-0 mt-2"><strong>As per public request, final registration is open! We already covered 100+
+                    registrations! Cheers to us!</strong></p>
         </div>
         <div class="countdown-timer mb-4"
-            data-event-date="{{ content.get('registration_deadline', 'February 28, 2026') }}">
+            data-event-date="{{ content.get('registration_deadline', 'March 2, 2026 12:00:00') }}">
             <div class="countdown-item">
                 <div class="number" id="days">00</div>
                 <div class="label">Days</div>
@@ -50,8 +51,8 @@
                 <div class="label">Seconds</div>
             </div>
         </div>
-        <p class="text-white mb-3 small"><strong>Countdown to last registration date ({{
-                content.get('registration_deadline', 'February 28, 2026') }})</strong>
+        <p class="text-white mb-3 small"><strong>Countdown to final registration deadline ({{
+                content.get('registration_deadline', 'March 2, 2026 12:00:00') }})</strong>
         </p>
         <div class="mb-4 d-flex flex-wrap justify-content-center gap-2">
             <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">Event: {{ content.event_date }} at {{
@@ -204,28 +205,7 @@
             style="background: linear-gradient(45deg, #ff2f92, #ffd400, #ffa500, #32cd32, #00ced1, #1e90ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold; font-size: clamp(2.5rem, 5vw, 4rem);">
             Book Your Tickets</h2>
 
-        <div class="group-offer-banner mb-5">
-            <div class="group-offer-inner">
-                <div class="row align-items-center g-4">
-                    <div class="col-12 col-lg-2 text-center order-2 order-lg-1">
-                        <span class="group-offer-icon">🎉</span>
-                        <h3 class="group-offer-percent mb-0">15%</h3>
-                        <small class="text-white-50">OFF</small>
-                    </div>
-                    <div class="col-12 col-lg-7 order-1 order-lg-2">
-                        <h4 class="mb-2">Special Offers!</h4>
-                        <ul class="mb-0 list-unstyled text-white">
-                            <li>🔥 <strong>Group Booking (8+):</strong> Get <strong>15% OFF</strong>!</li>
-                            <li>👥 <strong>Group Booking (5-7):</strong> Get <strong>10% OFF</strong>!</li>
-                            <li>❤️ <strong>Lovebird/Couple (2):</strong> Get <strong>10% OFF</strong>!</li>
-                        </ul>
-                    </div>
-                    <div class="col-12 col-lg-3 text-center text-lg-end order-3">
-                        <span class="badge bg-light text-dark fs-6 px-3 py-2">Select passes to apply!</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Special offers removed -->
 
         <div class="row g-4">
             <div class="col-md-6">
@@ -431,46 +411,12 @@
         let isGroup = false;
         let isCouple = false;
 
-        // Handle Couple Discount Checkbox Visibility
-        const coupleContainer = document.getElementById('coupleDiscountContainer');
-        const coupleCheck = document.getElementById('coupleDiscountCheck');
-
-        if (passes === 2) {
-            coupleContainer.style.display = 'block';
-            if (coupleCheck.checked) {
-                isCouple = true;
-            }
-        } else {
-            coupleContainer.style.display = 'none';
-            coupleCheck.checked = false; // Reset if not 2 passes
-        }
-
-        // Calculate Discount
-        if (passes >= 8) {
-            discount = Math.round(subtotal * 0.15);
-            discountText = '– 15% Group Discount (8+ Tix)';
-            document.getElementById('groupDiscountText').innerHTML = '🎉 <strong>Mega Group Offer!</strong> 15% discount applied for 8+ members';
-            document.getElementById('groupDiscountText').style.display = 'block';
-            isGroup = true;
-        } else if (passes >= 5) {
-            discount = Math.round(subtotal * 0.10);
-            discountText = '– 10% Group Discount (5+ Tix)';
-            document.getElementById('groupDiscountText').innerHTML = '🎉 <strong>Group Offer!</strong> 10% discount applied for 5+ members';
-            document.getElementById('groupDiscountText').style.display = 'block';
-            isGroup = true;
-        } else if (isCouple) {
-            discount = Math.round(subtotal * 0.10);
-            discountText = '– 10% Couple Discount ❤️';
-            document.getElementById('groupDiscountText').style.display = 'none';
-        } else {
-            document.getElementById('groupDiscountText').style.display = 'none';
-        }
-
-        const total = subtotal - discount;
+        // Logic for discounts removed as per client request
+        const total = subtotal;
 
         document.getElementById('pass_type').value = passType;
         document.getElementById('amount').value = total;
-        document.getElementById('is_couple_booking').value = isCouple ? 'true' : 'false';
+        document.getElementById('is_couple_booking').value = 'false';
 
         document.getElementById('subtotal').textContent = subtotal;
         document.getElementById('total').textContent = total;
@@ -478,13 +424,9 @@
         document.getElementById('selectedPasses').textContent = passes;
         document.getElementById('passTypeLabel').textContent = PASS_LABELS[passType] || 'Entry Only';
 
-        const discountLine = document.getElementById('discountLine');
-        if (discount > 0) {
-            discountLine.textContent = discountText;
-            discountLine.style.display = 'inline';
-        } else {
-            discountLine.style.display = 'none';
-        }
+        document.getElementById('coupleDiscountContainer').style.display = 'none';
+        document.getElementById('groupDiscountText').style.display = 'none';
+        document.getElementById('discountLine').style.display = 'none';
 
         // Highlight selected option
         document.querySelectorAll('.pass-option').forEach(opt => {
@@ -521,8 +463,24 @@
         });
     });
 
-    // Form validation
+    // Form validation and Deadline Check
     document.getElementById('bookingForm').addEventListener('submit', function (e) {
+        // Enforce registration deadline
+        const registrationDeadlineStr = "{{ content.get('registration_deadline', 'March 2, 2026 12:00:00') }}";
+        // Handle both formats: "March 2, 2026 12:00:00" and "2026-03-02 12:00:00"
+        let deadline = new Date(registrationDeadlineStr);
+        if (isNaN(deadline.getTime())) {
+            // Try explicit parsing if native fails
+            deadline = new Date(registrationDeadlineStr.replace(',', ''));
+        }
+        const now = new Date();
+
+        if (now > deadline) {
+            alert('Registration has closed! The deadline was March 2nd, 12:00 PM.');
+            e.preventDefault();
+            return false;
+        }
+
         const phone = document.getElementById('phone').value;
         const email = document.getElementById('email').value;
         const name = document.getElementById('name').value;

@@ -10,9 +10,13 @@ function updateCountdown() {
     if (!timerEl) return;
 
     // Get date from data attribute or fallback to hardcoded
-    const dateStr = timerEl.getAttribute('data-event-date') || 'February 28, 2026';
-    // Append time to ensure it counts down to end of that day (or start, depending on need. User said "Last Date of Registration", usually implies end of day)
-    const eventDate = new Date(dateStr + ' 23:59:59').getTime();
+    const dateStr = timerEl.getAttribute('data-event-date') || 'March 2, 2026 12:00:00';
+    // Append time only if it's missing (to avoid breaking "YYYY-MM-DD HH:MM:SS" format)
+    let fullDateStr = dateStr;
+    if (!dateStr.includes(':')) {
+        fullDateStr += ' 23:59:59';
+    }
+    const eventDate = new Date(fullDateStr).getTime();
     const now = new Date().getTime();
     const distance = eventDate - now;
 
